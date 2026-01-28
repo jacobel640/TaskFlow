@@ -9,36 +9,40 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +58,7 @@ import com.jel.taskflow.tasks.model.TasksViewModel
 import com.jel.taskflow.tasks.ui.componenets.TaskItem
 import com.jel.taskflow.tasks.ui.utils.Screen
 import com.jel.taskflow.ui.theme.TaskFlowTheme
+import com.jel.taskflow.utils.flatColors
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,6 +67,7 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
 
     val tasks = viewModel.tasks.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    var firstListItemShown by rememberSaveable { mutableStateOf(false) }
 
 //    LaunchedEffect(key1 = viewModel.errorEvent) {
 //        viewModel.errorEvent.collect { message ->
@@ -76,29 +82,30 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
             TopAppBar(
                 title = {
                     Text(text = stringResource(R.string.app_name))
-                }
+                },
+                colors = TopAppBarDefaults.flatColors()
             )
         },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-                tonalElevation = 5.dp,
-                actions = {
-                    NavigationBarItem(
-                        selected = true,
-                        onClick = { },
-                        label = { Text(text = "Main List") },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.List,
-                                contentDescription = null
-                            )
-                        }
-                    )
-                }
-            )
-        },
+//        bottomBar = {
+//            BottomAppBar(
+//                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+//                contentColor = MaterialTheme.colorScheme.primary,
+//                tonalElevation = 5.dp,
+//                actions = {
+//                    NavigationBarItem(
+//                        selected = true,
+//                        onClick = { },
+//                        label = { Text(text = "Main List") },
+//                        icon = {
+//                            Icon(
+//                                imageVector = Icons.AutoMirrored.Rounded.List,
+//                                contentDescription = null
+//                            )
+//                        }
+//                    )
+//                }
+//            )
+//        },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
@@ -106,10 +113,24 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
                 modifier = Modifier.padding(10.dp),
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add, // Icons.Rounded.KeyboardArrowUp,
-                    contentDescription = "Add a Task"
-                )
+                Row(
+                    modifier = Modifier.padding(
+                        horizontal =
+                            if (firstListItemShown) 0.dp
+                            else 10.dp
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add, // Icons.Rounded.KeyboardArrowUp,
+                        contentDescription = stringResource(R.string.add_task)
+                    )
+                    AnimatedVisibility(visible = !firstListItemShown) {
+                        Text(
+                            modifier = Modifier.padding(start = 10.dp, end = 5.dp),
+                            text = stringResource(R.string.add_task)
+                        )
+                    }
+                }
             }
         }
     ) { innerPadding ->
@@ -131,6 +152,9 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
                     task.id?.let {
                         viewModel.deleteTask(it)
                     }
+                },
+                onListScroll = {
+                    firstListItemShown = it
                 }
             )
         }
@@ -143,6 +167,7 @@ fun ItemsList(
     tasks: State<List<Task>>,
     onItemClick: (Long?) -> Unit,
     deleteTaskClick: (Task) -> Unit,
+    onListScroll: (Boolean) -> Unit
 ) {
     var expandedItem by remember { mutableStateOf<Task?>(null) }
 
@@ -154,13 +179,17 @@ fun ItemsList(
         }
     }
 
+    LaunchedEffect(showScrollToTopButton) {
+        onListScroll(showScrollToTopButton)
+    }
+
     Box(modifier = modifier) {
         LazyColumn(
             state = state,
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 8.dp),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(items = tasks.value) { _, task ->
@@ -182,17 +211,21 @@ fun ItemsList(
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
             exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
         ) {
-            FloatingActionButton(
+            IconButton(
+                modifier = Modifier.padding(10.dp),
+                shape = CircleShape,
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                ),
                 onClick = {
                     coroutineScope.launch {
                         state.animateScrollToItem(0)
                     }
-                },
-                modifier = Modifier.padding(10.dp),
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
+                }
             ) {
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowUp,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = "Return to top"
                 )
             }

@@ -3,7 +3,7 @@ package com.jel.taskflow.utils
 import androidx.room.TypeConverter
 import com.jel.taskflow.tasks.model.Priority
 import com.jel.taskflow.tasks.model.Status
-import java.util.Date
+import kotlin.time.Instant
 
 class Converters {
 
@@ -17,25 +17,23 @@ class Converters {
         return Status.valueOf(value)
     }
 
-    class Converters {
-        @TypeConverter
-        fun fromPriority(priority: Priority): String {
-            return priority.name
-        }
-
-        @TypeConverter
-        fun toPriority(priority: String): Priority {
-            return Priority.valueOf(priority)
-        }
+    @TypeConverter
+    fun fromPriority(priority: Priority): String {
+        return priority.name
     }
 
     @TypeConverter
-    fun fromDateToTimestamp(date: Date): Long {
-        return date.time
+    fun toPriority(priority: String): Priority {
+        return Priority.valueOf(priority)
     }
 
     @TypeConverter
-    fun fromTimestamp(timestamp: Long): Date {
-        return Date(timestamp)
+    fun fromInstantToTimestamp(instant: Instant): Long {
+        return instant.toEpochMilliseconds()
+    }
+
+    @TypeConverter
+    fun fromTimestamp(timestamp: Long): Instant {
+        return Instant.fromEpochMilliseconds(timestamp)
     }
 }

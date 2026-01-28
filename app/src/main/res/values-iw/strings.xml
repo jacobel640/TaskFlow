@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Flow</string>
+    <string name="add_task">משימה חדשה</string>
+    <string name="edit_task">עריכת משימה</string>
+    <string name="title">כותרת</string>
+    <string name="task_content">תוכן משימה</string>
+    <string name="created_at">נוצר: %1$s</string>
+    <string name="updated_at">עודכן: %1$s</string>
+    <string name="priority">עדיפות</string>
+    <string name="status_todo">ממתין</string>
+    <string name="status_pending">בתהליך</string>
+    <string name="status_completed">הושלמה</string>
+    <string name="priority_low">נמוכה</string>
+    <string name="priority_medium">בינונית</string>
+    <string name="priority_high">גבוהה</string>
+</resources>

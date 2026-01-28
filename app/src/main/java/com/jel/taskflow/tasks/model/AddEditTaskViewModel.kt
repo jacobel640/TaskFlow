@@ -1,6 +1,5 @@
 package com.jel.taskflow.tasks.model
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,7 +10,6 @@ import com.jel.taskflow.tasks.repository.TaskRepository
 import com.jel.taskflow.tasks.ui.AddEditTaskUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Clock
 
@@ -49,6 +47,7 @@ class AddEditTaskViewModel @Inject constructor(
                     priority = task.priority,
                     createdDate = task.createdDate,
                     changedDate = task.changedDate,
+                    editMode = true,
                     isLoading = false,
                     currentTaskChanged = false
                 )
@@ -61,6 +60,7 @@ class AddEditTaskViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(title = newTitle)
             onCurrentTaskPropertyChanged()
+            updateUiStateHistory()
         }
     }
 
@@ -68,6 +68,7 @@ class AddEditTaskViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(content = newContent)
             onCurrentTaskPropertyChanged()
+            updateUiStateHistory()
         }
     }
 
@@ -87,30 +88,34 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun onCurrentTaskPropertyChanged() {
         uiState = uiState.copy(
-            changedDate = Date(Clock.System.now().toEpochMilliseconds()),
-            currentTaskChanged = uiState.title.isNotBlank() && uiState.content.isNotBlank()
+            changedDate = Clock.System.now(),
+            currentTaskChanged = uiState.title.isNotBlank() || uiState.content.isNotBlank()
         )
-        uiStatesHistory.add(uiState)
-        uiStateHistoryPosition = uiStatesHistory.size-1
-        println(uiState.toString())
+    }
+
+    fun updateUiStateHistory() {
+        uiStatesHistory.add(++uiStateHistoryPosition, uiState)
+
+        uiState = uiState.copy(
+            canUndo = canRevertBackwards(),
+            canRedo = canRevertForwards()
+        )
     }
 
     fun canRevertBackwards(): Boolean = uiStateHistoryPosition > 0
-    fun canRevertForwards(): Boolean = uiStateHistoryPosition < uiStatesHistory.size
+    fun canRevertForwards(): Boolean = uiStateHistoryPosition < uiStatesHistory.size - 1
 
-    fun revertChangesBackwards() {
-        uiState = uiStatesHistory[--uiStateHistoryPosition].copy(
-            status = uiState.status,
-            priority = uiState.priority
-        )
+    fun revertChanges(forwards: Boolean = false) {
+        uiState = if (forwards) getUiTextStateAt(++uiStateHistoryPosition)
+        else getUiTextStateAt(--uiStateHistoryPosition)
     }
 
-    fun revertChangesForwards() {
-        uiState = uiStatesHistory[++uiStateHistoryPosition].copy(
-            status = uiState.status,
-            priority = uiState.priority
-        )
-    }
+    fun getUiTextStateAt(index: Int): AddEditTaskUiState = uiStatesHistory[index].copy(
+        status = uiState.status,
+        priority = uiState.priority,
+        canUndo = canRevertBackwards(),
+        canRedo = canRevertForwards()
+    )
 
     fun reverseChanges() {
         currentTaskId?.let {

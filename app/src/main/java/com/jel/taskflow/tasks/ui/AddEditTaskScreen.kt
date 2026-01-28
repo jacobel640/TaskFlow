@@ -1,6 +1,7 @@
 package com.jel.taskflow.tasks.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,17 +12,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Redo
+import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Restore
-import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +36,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -43,6 +47,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -50,27 +56,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
+import com.jel.taskflow.R
 import com.jel.taskflow.tasks.model.AddEditTaskViewModel
 import com.jel.taskflow.tasks.model.Priority
 import com.jel.taskflow.tasks.model.Status
 import com.jel.taskflow.tasks.ui.componenets.priorityColor
 import com.jel.taskflow.tasks.ui.componenets.priorityContainerColor
 import com.jel.taskflow.ui.theme.TaskFlowTheme
+import com.jel.taskflow.utils.flatColors
+import com.jel.taskflow.utils.toRelativeTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditTaskScreen(
-    viewModel: AddEditTaskViewModel = hiltViewModel(),
-    navController: NavController,
-) {
+fun AddEditTaskScreen(viewModel: AddEditTaskViewModel = hiltViewModel()) {
     val state = viewModel.uiState
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -82,35 +91,33 @@ fun AddEditTaskScreen(
     }
 
     TaskFlowTheme {
-        Scaffold(
-            modifier = Modifier,
-            snackbarHost = { SnackbarHost(snackBarHostState) },
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = "Add Task")
-                    }
-                )
-            },
-            floatingActionButtonPosition = FabPosition.End,
-            floatingActionButton = {
-                if (state.currentTaskChanged) {
-                    FloatingActionButton(
-                        modifier = Modifier.padding(bottom = 10.dp),
-                        onClick = { viewModel.reverseChanges() },
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        elevation = FloatingActionButtonDefaults.elevation(),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Restore,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            contentDescription = "restore task changes"
-                        )
-                    }
+        Scaffold(modifier = Modifier, snackbarHost = { SnackbarHost(snackBarHostState) }, topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text =
+                            if (state.editMode) stringResource(R.string.edit_task)
+                            else stringResource(R.string.add_task)
+                    )
+                }, colors = TopAppBarDefaults.flatColors()
+            )
+        }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
+            if (state.currentTaskChanged) {
+                FloatingActionButton(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    onClick = { viewModel.reverseChanges() },
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    elevation = FloatingActionButtonDefaults.elevation(),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Restore,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        contentDescription = "restore task changes"
+                    )
                 }
             }
-        ) { innerPadding ->
+        }) { innerPadding ->
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -119,10 +126,7 @@ fun AddEditTaskScreen(
             ) {
                 TaskTextFieldsAndStatus(
                     modifier = Modifier.padding(10.dp),
-                    title = state.title,
-                    content = state.content,
-                    status = state.status,
-                    priority = state.priority,
+                    state = state,
                     onTitleChanged = { newTitle ->
                         viewModel.onTitleChanged(newTitle)
                     },
@@ -134,8 +138,9 @@ fun AddEditTaskScreen(
                     },
                     onPriorityChanged = { newPriority ->
                         viewModel.onPriorityChanged(newPriority)
-                    }
-                )
+                    },
+                    onUndo = { viewModel.revertChanges() },
+                    onRedo = { viewModel.revertChanges(forwards = true) })
             }
         }
     }
@@ -145,14 +150,13 @@ fun AddEditTaskScreen(
 @Composable
 fun TaskTextFieldsAndStatus(
     modifier: Modifier = Modifier,
-    title: String,
-    content: String,
-    status: Status,
-    priority: Priority,
+    state: AddEditTaskUiState,
     onTitleChanged: (String) -> Unit,
     onContentChanged: (String) -> Unit,
     onStatusChanged: (Status) -> Unit,
-    onPriorityChanged: (Priority) -> Unit
+    onPriorityChanged: (Priority) -> Unit,
+    onUndo: () -> Unit,
+    onRedo: () -> Unit
 ) {
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -162,19 +166,18 @@ fun TaskTextFieldsAndStatus(
                     .weight(1f)
                     .fillMaxWidth()
                     .weight(1f),
-                label = { Text(text = "Title") },
-                value = title,
+                label = { Text(text = stringResource(R.string.title)) },
+                value = state.title,
                 onValueChange = onTitleChanged
             )
             PriorityDropDown(
                 modifier = Modifier.padding(horizontal = 15.dp),
-                priority = priority,
+                priority = state.priority,
                 onPriorityChanged = onPriorityChanged
             )
         }
         StatusGroupButtons(
-            status = status,
-            onStatusChanged = onStatusChanged
+            status = state.status, onStatusChanged = onStatusChanged
         )
         Spacer(modifier = Modifier.padding(vertical = 5.dp))
         Box(
@@ -182,15 +185,32 @@ fun TaskTextFieldsAndStatus(
         ) {
             TextField(
                 modifier = Modifier.fillMaxSize(),
-                label = { Text(text = "Task content") },
-                value = content,
-                onValueChange = onContentChanged
+                label = { Text(text = stringResource(R.string.task_content)) },
+                value = state.content,
+                onValueChange = onContentChanged,
             )
-            ButtonGroup(
-
-            ) {
-
-            }
+            UndoRedoControl(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 5.dp),
+                canUndo = state.canUndo,
+                canRedo = state.canRedo,
+                onUndo = onUndo,
+                onRedo = onRedo
+            )
+        }
+        Row {
+            Text(
+                text = stringResource(R.string.created_at, state.createdDate.toRelativeTime()),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline,
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = stringResource(R.string.updated_at, state.changedDate.toRelativeTime()),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline,
+            )
         }
     }
 }
@@ -198,9 +218,7 @@ fun TaskTextFieldsAndStatus(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PriorityDropDown(
-    modifier: Modifier = Modifier,
-    priority: Priority,
-    onPriorityChanged: (Priority) -> Unit
+    modifier: Modifier = Modifier, priority: Priority, onPriorityChanged: (Priority) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -208,16 +226,20 @@ fun PriorityDropDown(
         ExposedDropdownMenuBox(
             modifier = modifier.padding(top = 10.dp),
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
+            onExpandedChange = { expanded = !expanded }) {
             Text(
-                text = "Priority",
+                text = stringResource(R.string.priority),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.offset(x = 10.dp, y = (-10).dp)
             )
             AssistChip(
-                label = { Text(priority.name, color = priorityColor(priority)) },
+                label = {
+                    Text(
+                        text = priority.getLabel(LocalContext.current),
+                        color = priorityColor(priority)
+                    )
+                },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = priorityContainerColor(priority),
@@ -225,8 +247,7 @@ fun PriorityDropDown(
                     trailingIconContentColor = priorityColor(priority)
                 ),
                 modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                onClick = {}
-            )
+                onClick = {})
 
             MaterialTheme(
                 shapes = MaterialTheme.shapes.copy(extraSmall = MaterialTheme.shapes.medium)
@@ -243,29 +264,23 @@ fun PriorityDropDown(
                 ) {
 
                     Priority.entries.forEach { entry ->
-                        val priorityName = when (entry) {
-                            Priority.LOW -> "Low"
-                            Priority.MEDIUM -> "Medium"
-                            Priority.HIGH -> "High"
-                        }
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = priorityName, color = priorityColor(entry))
-                            },
-                            onClick = {
-                                onPriorityChanged(entry)
-                                expanded = false
-                            },
-                            trailingIcon = {
-                                if (entry == priority) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Check,
-                                        contentDescription = "Selected Priority",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                        DropdownMenuItem(text = {
+                            Text(
+                                text = entry.getLabel(LocalContext.current),
+                                color = priorityColor(entry)
+                            )
+                        }, onClick = {
+                            onPriorityChanged(entry)
+                            expanded = false
+                        }, trailingIcon = {
+                            if (entry == priority) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Check,
+                                    contentDescription = "Selected Priority",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
                             }
-                        )
+                        })
                     }
                 }
             }
@@ -276,8 +291,7 @@ fun PriorityDropDown(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StatusGroupButtons(
-    status: Status,
-    onStatusChanged: (Status) -> Unit
+    status: Status, onStatusChanged: (Status) -> Unit
 ) {
     Text(
         modifier = Modifier
@@ -302,20 +316,22 @@ fun StatusGroupButtons(
                 modifier = Modifier.semantics { role = Role.RadioButton },
                 checked = selected,
                 onCheckedChange = { onStatusChanged(entry) },
-                shapes =
-                    when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        Status.entries.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    }
+                shapes = when (index) {
+                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    Status.entries.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                }
             ) {
                 AnimatedVisibility(selected) {
                     Row {
-                        Icon(Icons.Rounded.Check, "${entry.getLabel()} selected.")
+                        Icon(
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = "${entry.getLabel(LocalContext.current)} selected."
+                        )
                         Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
                     }
                 }
-                Text(text = entry.getLabel())
+                Text(text = entry.getLabel(LocalContext.current))
             }
         }
     }
@@ -344,6 +360,59 @@ fun StatusGroupButtons(
 //        }
 }
 
+@Composable
+fun UndoRedoControl(
+    canUndo: Boolean,
+    canRedo: Boolean,
+    onUndo: () -> Unit,
+    onRedo: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        border = BorderStroke(
+            width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onUndo, enabled = canUndo
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.Undo,
+                    contentDescription = "Undo",
+                    tint = if (canUndo) MaterialTheme.colorScheme.onSurface else Color.Gray.copy(
+                        alpha = 0.3f
+                    )
+                )
+            }
+
+            VerticalDivider(
+                modifier = Modifier
+                    .height(24.dp)
+                    .width(1.dp),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            IconButton(
+                onClick = onRedo, enabled = canRedo
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.Redo,
+                    contentDescription = "Redo",
+                    tint = if (canRedo) MaterialTheme.colorScheme.onSurface else Color.Gray.copy(
+                        alpha = 0.3f
+                    )
+                )
+            }
+        }
+    }
+}
+
 
 //@Preview
 //@Composable
@@ -358,14 +427,12 @@ fun StatusGroupButtons(
 fun TaskTextFieldsAndStatusPreview() {
     TaskFlowTheme {
         TaskTextFieldsAndStatus(
-            title = "Title",
-            content = "Text written in the Content section saved along the title in the database.",
-            status = Status.TODO,
-            priority = Priority.MEDIUM,
+            state = AddEditTaskUiState(),
             onTitleChanged = {},
             onContentChanged = {},
             onStatusChanged = {},
-            onPriorityChanged = {}
-        )
+            onPriorityChanged = {},
+            onUndo = {},
+            onRedo = {})
     }
 }

@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.remember
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,7 +43,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ) {
                         // the SavedStateHandle in the AddEditTaskViewModel is injecting the above taskId argument
-                        AddEditTaskScreen(navController = navController)
+                        AddEditTaskScreen()
                     }
                 }
             }

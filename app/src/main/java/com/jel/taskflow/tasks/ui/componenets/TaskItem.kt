@@ -12,16 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Assignment
 import androidx.compose.material.icons.outlined.Pending
 import androidx.compose.material.icons.rounded.AccessTime
-import androidx.compose.material.icons.rounded.Assignment
-import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
-import androidx.compose.material.icons.rounded.Pending
-import androidx.compose.material.icons.rounded.PendingActions
 import androidx.compose.material.icons.rounded.TaskAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.tasks.model.Priority
@@ -50,7 +46,6 @@ fun TaskItem(
     onExpandedClicked: () -> Unit,
     onDelete: () -> Unit
 ) {
-//    val task = task.copy(status = Status.COMPLETED)
     val elevation by animateDpAsState(
         targetValue = if (expanded) 4.dp else 0.dp
     )
@@ -66,14 +61,14 @@ fun TaskItem(
     ) {
         Row(Modifier.padding(start = 15.dp, top = 10.dp)) {
             IndicatorChip(
-                label = task.status.getLabel(),
+                label = task.status.getLabel(LocalContext.current),
                 imageVector = statusIcon(task.status),
                 color = statusColor(task.status),
                 containerColor = statusContainerColor(task.status)
             )
             Spacer(Modifier.padding(horizontal = 2.dp))
             IndicatorChip(
-                label = task.priority.name,
+                label = task.priority.getLabel(LocalContext.current),
                 color = priorityColor(task.priority),
                 containerColor = priorityContainerColor(task.priority)
             )
