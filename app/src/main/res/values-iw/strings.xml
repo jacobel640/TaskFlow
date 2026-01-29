@@ -14,4 +14,5 @@
     <string name="priority_low">נמוכה</string>
     <string name="priority_medium">בינונית</string>
     <string name="priority_high">גבוהה</string>
+    <string name="task_progress">מצב המשימה</string>
 </resources>
