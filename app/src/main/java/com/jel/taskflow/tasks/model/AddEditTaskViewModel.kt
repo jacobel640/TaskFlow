@@ -40,6 +40,7 @@ class AddEditTaskViewModel @Inject constructor(
     private fun loadTask(taskId: Long) {
         viewModelScope.launch {
             repository.getTaskById(taskId)?.let { task ->
+                uiStateHistoryPosition = 0
                 uiState = uiState.copy(
                     title = task.title,
                     content = task.content,
@@ -49,7 +50,9 @@ class AddEditTaskViewModel @Inject constructor(
                     changedDate = task.changedDate,
                     editMode = true,
                     isLoading = false,
-                    currentTaskChanged = false
+                    currentTaskChanged = false,
+                    canUndo = canRevertBackwards(),
+                    canRedo = canRevertForwards()
                 )
                 uiStatesHistory.add(uiState)
             }
@@ -125,6 +128,7 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun saveTask() {
         viewModelScope.launch {
+            uiState = uiState.copy(currentTaskChanged = false)
             repository.insertTask(
                 Task(
                     id = currentTaskId,
@@ -136,7 +140,6 @@ class AddEditTaskViewModel @Inject constructor(
                     changedDate = uiState.changedDate,
                 )
             )
-            uiState = uiState.copy()
         }
     }
 }
