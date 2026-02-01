@@ -29,7 +29,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.model.Priority
+import com.jel.taskflow.tasks.model.enums.Priority
+import com.jel.taskflow.tasks.model.enums.extensions.color
+import com.jel.taskflow.tasks.model.enums.extensions.containerColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -55,14 +57,14 @@ fun PriorityDropDown(
                 label = {
                     Text(
                         text = priority.getLabel(LocalContext.current),
-                        color = priorityColor(priority)
+                        color = priority.color
                     )
                 },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = priorityContainerColor(priority),
-                    labelColor = priorityColor(priority),
-                    trailingIconContentColor = priorityColor(priority)
+                    containerColor = priority.containerColor,
+                    labelColor = priority.color,
+                    trailingIconContentColor = priority.color
                 ),
                 modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 onClick = {})
@@ -85,7 +87,7 @@ fun PriorityDropDown(
                         DropdownMenuItem(text = {
                             Text(
                                 text = entry.getLabel(LocalContext.current),
-                                color = priorityColor(entry)
+                                color = priority.color
                             )
                         }, onClick = {
                             onPriorityChanged(entry)

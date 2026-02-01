@@ -1,8 +1,8 @@
 package com.jel.taskflow.utils
 
 import androidx.room.TypeConverter
-import com.jel.taskflow.tasks.model.Priority
-import com.jel.taskflow.tasks.model.Status
+import com.jel.taskflow.tasks.model.enums.Priority
+import com.jel.taskflow.tasks.model.enums.Status
 import kotlin.time.Instant
 
 class Converters {

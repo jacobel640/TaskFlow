@@ -1,7 +1,7 @@
 package com.jel.taskflow.tasks.ui
 
-import com.jel.taskflow.tasks.model.Priority
-import com.jel.taskflow.tasks.model.Status
+import com.jel.taskflow.tasks.model.enums.Priority
+import com.jel.taskflow.tasks.model.enums.Status
 import kotlin.time.Clock
 import kotlin.time.Instant
 

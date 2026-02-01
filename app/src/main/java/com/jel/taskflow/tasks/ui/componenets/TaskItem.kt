@@ -31,11 +31,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jel.taskflow.tasks.model.Priority
-import com.jel.taskflow.tasks.model.Status
+import com.jel.taskflow.tasks.model.enums.Priority
+import com.jel.taskflow.tasks.model.enums.Status
 import com.jel.taskflow.tasks.model.Task
+import com.jel.taskflow.tasks.model.enums.extensions.color
+import com.jel.taskflow.tasks.model.enums.extensions.containerColor
+import com.jel.taskflow.tasks.model.enums.extensions.imageVector
 import com.jel.taskflow.ui.theme.TaskFlowTheme
 
 @Composable
@@ -62,15 +66,15 @@ fun TaskItem(
         Row(Modifier.padding(start = 15.dp, top = 10.dp)) {
             IndicatorChip(
                 label = task.status.getLabel(LocalContext.current),
-                imageVector = statusIcon(task.status),
-                color = statusColor(task.status),
-                containerColor = statusContainerColor(task.status)
+                imageVector = task.status.imageVector,
+                color = task.status.color,
+                containerColor = task.status.containerColor
             )
             Spacer(Modifier.padding(horizontal = 2.dp))
             IndicatorChip(
                 label = task.priority.getLabel(LocalContext.current),
-                color = priorityColor(task.priority),
-                containerColor = priorityContainerColor(task.priority)
+                color = task.priority.color,
+                containerColor = task.priority.containerColor
             )
         }
         Column(
@@ -116,7 +120,10 @@ fun TaskItem(
                         Text(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             text = task.content,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 10,
+                            overflow = TextOverflow.Ellipsis,
+                            softWrap = true
                         )
 
                     }
@@ -142,46 +149,6 @@ fun TaskItem(
         }
     }
 }
-
-@Composable
-fun priorityColor(priority: Priority): Color =
-    when (priority) {
-        Priority.LOW -> MaterialTheme.colorScheme.onSurface
-        Priority.MEDIUM -> MaterialTheme.colorScheme.primary
-        Priority.HIGH -> MaterialTheme.colorScheme.error
-    }
-
-@Composable
-fun priorityContainerColor(priority: Priority): Color =
-    when (priority) {
-        Priority.LOW -> MaterialTheme.colorScheme.surfaceContainer
-        Priority.MEDIUM -> MaterialTheme.colorScheme.primaryContainer
-        Priority.HIGH -> MaterialTheme.colorScheme.errorContainer
-    }
-
-@Composable
-fun statusIcon(status: Status): ImageVector =
-    when (status) {
-        Status.TODO -> Icons.Rounded.AccessTime
-        Status.IN_PROGRESS -> Icons.Outlined.Pending
-        Status.COMPLETED -> Icons.Rounded.TaskAlt
-    }
-
-@Composable
-fun statusColor(status: Status): Color =
-    when (status) {
-        Status.TODO -> MaterialTheme.colorScheme.secondary
-        Status.IN_PROGRESS -> MaterialTheme.colorScheme.primary
-        Status.COMPLETED -> MaterialTheme.colorScheme.tertiary
-    }
-
-@Composable
-fun statusContainerColor(status: Status): Color =
-    when (status) {
-        Status.TODO -> MaterialTheme.colorScheme.secondaryContainer
-        Status.IN_PROGRESS -> MaterialTheme.colorScheme.primaryContainer
-        Status.COMPLETED -> MaterialTheme.colorScheme.tertiaryContainer
-    }
 
 @Preview
 @Composable

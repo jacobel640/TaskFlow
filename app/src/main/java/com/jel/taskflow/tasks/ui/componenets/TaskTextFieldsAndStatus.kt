@@ -20,8 +20,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.model.Priority
-import com.jel.taskflow.tasks.model.Status
+import com.jel.taskflow.tasks.model.enums.Priority
+import com.jel.taskflow.tasks.model.enums.Status
 import com.jel.taskflow.tasks.ui.AddEditTaskUiState
 import com.jel.taskflow.ui.theme.TaskFlowTheme
 import com.jel.taskflow.utils.toRelativeTime

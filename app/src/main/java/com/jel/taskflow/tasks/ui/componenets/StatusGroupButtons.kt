@@ -26,7 +26,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.model.Status
+import com.jel.taskflow.tasks.model.enums.Status
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
