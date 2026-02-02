@@ -19,7 +19,6 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -27,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.model.enums.Status
+import com.jel.taskflow.tasks.model.enums.extensions.labelRes
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -66,15 +66,16 @@ fun StatusGroupButtons(
                     Row {
                         Icon(
                             imageVector = Icons.Rounded.Check,
-                            contentDescription = "${entry.getLabel(LocalContext.current)} selected."
+                            contentDescription = "${stringResource(entry.labelRes)} selected."
                         )
                         Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
                     }
                 }
-                Text(text = entry.getLabel(LocalContext.current))
+                Text(text = stringResource(entry.labelRes))
             }
         }
     }
+            /* not stable yet */
 //        SingleChoiceSegmentedButtonRow(
 //            modifier = Modifier.fillMaxWidth(),
 //            space = (-4).dp

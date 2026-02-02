@@ -60,14 +60,14 @@ fun TaskItem(
     ) {
         Row(Modifier.padding(start = 15.dp, top = 10.dp)) {
             IndicatorChip(
-                label = task.status.getLabel(LocalContext.current),
+                label = stringResource(task.status.labelRes),
                 imageVector = task.status.imageVector,
                 color = task.status.color,
                 containerColor = task.status.containerColor
             )
             Spacer(Modifier.padding(horizontal = 2.dp))
             IndicatorChip(
-                label = task.priority.getLabel(LocalContext.current),
+                label = stringResource(task.priority.labelRes),
                 color = task.priority.color,
                 containerColor = task.priority.containerColor
             )

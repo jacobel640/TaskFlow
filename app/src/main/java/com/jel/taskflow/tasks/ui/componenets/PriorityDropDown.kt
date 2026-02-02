@@ -25,13 +25,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.model.enums.Priority
 import com.jel.taskflow.tasks.model.enums.extensions.color
 import com.jel.taskflow.tasks.model.enums.extensions.containerColor
+import com.jel.taskflow.tasks.model.enums.extensions.labelRes
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -56,7 +56,7 @@ fun PriorityDropDown(
             AssistChip(
                 label = {
                     Text(
-                        text = priority.getLabel(LocalContext.current),
+                        text = stringResource(priority.labelRes),
                         color = priority.color
                     )
                 },
@@ -86,8 +86,8 @@ fun PriorityDropDown(
                     Priority.entries.forEach { entry ->
                         DropdownMenuItem(text = {
                             Text(
-                                text = entry.getLabel(LocalContext.current),
-                                color = priority.color
+                                text = stringResource(entry.labelRes),
+                                color = entry.color
                             )
                         }, onClick = {
                             onPriorityChanged(entry)
