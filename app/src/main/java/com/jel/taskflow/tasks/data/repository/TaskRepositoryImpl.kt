@@ -14,7 +14,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao): TaskRepository {
         }
     }
 
-    override suspend fun getTaskById(id: Long): Task? {
+    override fun getTaskById(id: Long): Flow<Task?> {
         return taskDao.getTaskById(id)
     }
 

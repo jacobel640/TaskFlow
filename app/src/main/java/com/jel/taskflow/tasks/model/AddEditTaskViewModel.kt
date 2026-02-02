@@ -34,29 +34,31 @@ class AddEditTaskViewModel @Inject constructor(
             println("taskId=$taskId")
             if (taskId != -1L) {
                 currentTaskId = taskId
-                loadTask(taskId)
+                observeTask(taskId)
             } else uiStatesHistory.add(uiState)
         }
     }
 
-    private fun loadTask(taskId: Long) {
+    private fun observeTask(taskId: Long) {
         viewModelScope.launch {
-            repository.getTaskById(taskId)?.let { task ->
-                uiStateHistoryPosition = 0
-                uiState = uiState.copy(
-                    title = task.title,
-                    content = task.content,
-                    status = task.status,
-                    priority = task.priority,
-                    createdDate = task.createdDate,
-                    changedDate = task.changedDate,
-                    editMode = true,
-                    isLoading = false,
-                    currentTaskChanged = false,
-                    canUndo = canRevertBackwards(),
-                    canRedo = canRevertForwards()
-                )
-                uiStatesHistory.add(uiState)
+            repository.getTaskById(taskId).collect { task ->
+                task?.let {
+                    uiStateHistoryPosition = 0
+                    uiState = uiState.copy(
+                        title = task.title,
+                        content = task.content,
+                        status = task.status,
+                        priority = task.priority,
+                        createdDate = task.createdDate,
+                        changedDate = task.changedDate,
+                        editMode = true,
+                        isLoading = false,
+                        currentTaskChanged = false,
+                        canUndo = canRevertBackwards(),
+                        canRedo = canRevertForwards()
+                    )
+                    uiStatesHistory.add(uiState)
+                }
             }
         }
     }
@@ -124,7 +126,7 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun reverseChanges() {
         currentTaskId?.let {
-            loadTask(it)
+            observeTask(it)
         }
     }
 

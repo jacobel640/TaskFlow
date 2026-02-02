@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.jel.taskflow.tasks.ui.AddEditTaskScreen
+import com.jel.taskflow.tasks.ui.TaskScreen
 import com.jel.taskflow.tasks.ui.utils.Screen
 import com.jel.taskflow.tasks.ui.TasksScreen
 import com.jel.taskflow.ui.theme.TaskFlowTheme
@@ -30,6 +31,19 @@ class MainActivity : ComponentActivity() {
                 )  {
                     composable(route = Screen.TasksScreen.route) {
                         TasksScreen(navController = navController)
+                    }
+                    composable(
+                        route = Screen.TaskScreen.route + "?taskId={taskId}",
+                        arguments = listOf(
+                            navArgument(
+                                name = "taskId"
+                            ) {
+                                type = NavType.LongType
+                                defaultValue = -1L
+                            }
+                        )
+                    ) {
+                        TaskScreen(navController = navController)
                     }
                     composable(
                         route = Screen.AddEditTaskScreen.route + "?taskId={taskId}",

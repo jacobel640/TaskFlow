@@ -144,7 +144,7 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
                 onItemClick = { taskId ->
                     taskId?.let {
                         navController.navigate(
-                            route = Screen.AddEditTaskScreen.route + "?taskId=${taskId}"
+                            route = Screen.TaskScreen.route + "?taskId=${taskId}"
                         )
                     }
                 },
