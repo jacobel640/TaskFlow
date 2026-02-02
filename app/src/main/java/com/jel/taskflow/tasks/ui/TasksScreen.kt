@@ -69,11 +69,34 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
     val snackBarHostState = remember { SnackbarHostState() }
     var firstListItemShown by rememberSaveable { mutableStateOf(false) }
 
-//    LaunchedEffect(key1 = viewModel.errorEvent) {
-//        viewModel.errorEvent.collect { message ->
-//            snackBarHostState.showSnackbar(message)
-//        }
-//    }
+    val currentBackStackEntry = navController.currentBackStackEntry
+    LaunchedEffect(currentBackStackEntry) {
+        val savedStateHandle = currentBackStackEntry?.savedStateHandle
+        savedStateHandle?.get<Long>("deletedTaskId")?.let { taskId ->
+            viewModel.deleteTask(taskId)
+            savedStateHandle.remove<Long>("deletedTaskId")
+        }
+    }
+
+    LaunchedEffect(key1 = viewModel.uiEvent) {
+        viewModel.uiEvent.collect { event ->
+            when(event) {
+                is UiEvent.ShowUndoDeleteSnackbar -> {
+                    val result = snackBarHostState.showSnackbar(
+                        message = "task deleted successfully",
+                        actionLabel = "Undo",
+                        duration = SnackbarDuration.Short
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.restoreDeletedTask()
+                    }
+                }
+                is UiEvent.ShowDeleteFailedSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
