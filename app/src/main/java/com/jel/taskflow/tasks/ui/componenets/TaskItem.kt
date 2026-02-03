@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,10 @@ import com.jel.taskflow.tasks.model.enums.extensions.color
 import com.jel.taskflow.tasks.model.enums.extensions.containerColor
 import com.jel.taskflow.tasks.model.enums.extensions.imageVector
 import com.jel.taskflow.ui.theme.TaskFlowTheme
+
+val ColorScheme.collapsedColor: Color
+    @Composable
+    get() = this.primaryContainer.copy(alpha = 0.5f).compositeOver(this.background)
 
 @Composable
 fun TaskItem(
@@ -49,11 +55,18 @@ fun TaskItem(
         targetValue = if (expanded) 4.dp else 0.dp
     )
 
+    val collapsedColor = MaterialTheme.colorScheme.collapsedColor
+    val expendedColor = MaterialTheme.colorScheme.primaryContainer
+
+    val animatedColor by animateColorAsState(
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
+        targetValue = if (expanded) expendedColor else collapsedColor,
+        label = "cardColor"
+    )
+
     Surface(
         modifier = modifier,
-        color =
-            if (expanded) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        color = animatedColor,
         shape = MaterialTheme.shapes.medium,
         tonalElevation = elevation,
         shadowElevation = elevation
