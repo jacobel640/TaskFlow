@@ -40,9 +40,9 @@ fun AddEditTaskScreen(viewModel: AddEditTaskViewModel = hiltViewModel()) {
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    DisposableEffect(key1 = state.currentTaskChanged) {
+    DisposableEffect(Unit) {
         onDispose {
-            if (state.currentTaskChanged) viewModel.saveTask()
+            if (viewModel.shouldSaveTask()) viewModel.saveTask()
         }
     }
 

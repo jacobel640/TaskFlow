@@ -104,7 +104,7 @@ class AddEditTaskViewModel @Inject constructor(
     fun onCurrentTaskPropertyChanged() {
         uiState = uiState.copy(
             changedDate = Clock.System.now(),
-            currentTaskChanged = uiState.title.isNotBlank() || uiState.content.isNotBlank()
+            currentTaskChanged = uiStatesHistory.isNotEmpty()
         )
     }
 
@@ -147,6 +147,10 @@ class AddEditTaskViewModel @Inject constructor(
             )
         }
     }
+
+    fun shouldSaveTask(): Boolean =
+        uiState.currentTaskChanged || currentTaskId == null &&
+                (uiState.title.isNotBlank() || uiState.content.text.isNotBlank())
 
     fun saveTask() {
         viewModelScope.launch {
