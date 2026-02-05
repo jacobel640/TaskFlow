@@ -1,9 +1,13 @@
 package com.jel.taskflow.tasks.ui.componenets
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,12 +38,14 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.tasks.model.Task
 import com.jel.taskflow.tasks.model.enums.Priority
 import com.jel.taskflow.tasks.model.enums.extensions.color
 import com.jel.taskflow.tasks.model.enums.extensions.containerColor
 import com.jel.taskflow.tasks.model.enums.extensions.imageVector
+import com.jel.taskflow.tasks.model.enums.extensions.labelRes
 import com.jel.taskflow.ui.theme.TaskFlowTheme
 
 val ColorScheme.collapsedColor: Color
@@ -101,12 +107,6 @@ fun TaskItem(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
-                .animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
         ) {
             Row {
                 Text(
@@ -130,39 +130,49 @@ fun TaskItem(
                     }
                 }
             }
-            if (expanded) {
-                Surface(
-                    modifier = Modifier.padding(top = 8.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
-                ) {
-                    Row(Modifier.fillMaxWidth()) {
+            val animationSpec: FiniteAnimationSpec<IntSize> = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(animationSpec),
+                exit = shrinkVertically(animationSpec)
+
+            ) {
+                Column {
+                    Surface(
+                        modifier = Modifier.padding(top = 8.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+                    ) {
                         Text(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .fillMaxWidth(),
                             text = task.content,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 10,
                             overflow = TextOverflow.Ellipsis,
                             softWrap = true
                         )
-
                     }
-                }
-                Spacer(Modifier.padding(vertical = 5.dp))
-                Row(Modifier.fillMaxWidth()) {
-                    IconButton(
-                        modifier = Modifier
-                            .clip(shape = MaterialTheme.shapes.large)
-                            .background(color = MaterialTheme.colorScheme.primaryContainer)
-                            .size(30.dp),
-                        onClick = onDelete,
-                        shape = MaterialTheme.shapes.large,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Delete,
-                            tint = MaterialTheme.colorScheme.error,
-                            contentDescription = "Delete Task"
-                        )
+                    Spacer(Modifier.padding(vertical = 5.dp))
+                    Row(Modifier.fillMaxWidth()) {
+                        IconButton(
+                            modifier = Modifier
+                                .clip(shape = MaterialTheme.shapes.large)
+                                .background(color = MaterialTheme.colorScheme.primaryContainer)
+                                .size(30.dp),
+                            onClick = { showDeleteConfirmDialog = true },
+                            shape = MaterialTheme.shapes.large,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Delete Task"
+                            )
+                        }
                     }
                 }
             }
