@@ -15,4 +15,10 @@
     <string name="priority_medium">בינונית</string>
     <string name="priority_high">גבוהה</string>
     <string name="task_progress">מצב המשימה</string>
+    <string name="delete_confirm_dialog_message">האם אתה בטוח שאתה רוצה למחוק את %1$s?</string>
+    <string name="delete_confirm_dialog_title">אישור מחיקת משימה</string>
+    <string name="delete_confirm_dialog_action_confirm">אישור</string>
+    <string name="delete_confirm_dialog_action_cancel">ביטול</string>
+    <string name="task_deleted_successfully_message">משימה נמחקה בהצלחה</string>
+    <string name="undo_action">בטל</string>
 </resources>

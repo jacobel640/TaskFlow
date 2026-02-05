@@ -9,6 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.jel.taskflow.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,7 +21,7 @@ fun DeleteDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Delete Task confirmation") },
+        title = { Text(text = stringResource(R.string.delete_confirm_dialog_title)) },
         icon = {
             Icon(
                 imageVector = Icons.Rounded.Delete,
@@ -29,19 +31,19 @@ fun DeleteDialog(
         },
         text = {
             Text(
-                text = "You sure you want to delete $taskTitle?"
+                text = stringResource(R.string.delete_confirm_dialog_message, taskTitle)
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = "Confirm")
+                Text(text = stringResource(R.string.delete_confirm_dialog_action_confirm))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text(text = "Cancel")
+                Text(text = stringResource(R.string.delete_confirm_dialog_action_cancel))
             }
         }
     )

@@ -14,4 +14,10 @@
     <string name="priority_medium">Medium</string>
     <string name="priority_high">High</string>
     <string name="task_progress">Task progress</string>
+    <string name="delete_confirm_dialog_message">You sure you want to delete %1$s?</string>
+    <string name="delete_confirm_dialog_title">Delete Task confirmation</string>
+    <string name="delete_confirm_dialog_action_confirm">Confirm</string>
+    <string name="delete_confirm_dialog_action_cancel">Cancel</string>
+    <string name="task_deleted_successfully_message">task deleted successfully</string>
+    <string name="undo_action">Undo</string>
 </resources>

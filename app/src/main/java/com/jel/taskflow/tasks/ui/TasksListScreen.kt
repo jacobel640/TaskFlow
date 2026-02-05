@@ -80,13 +80,15 @@ fun TasksListScreen(viewModel: TasksViewModel = hiltViewModel(), navController: 
         }
     }
 
+    val deleteSuccessMessage = stringResource(R.string.task_deleted_successfully_message)
+    val undoActionText = stringResource(R.string.undo_action)
     LaunchedEffect(key1 = viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
             when(event) {
                 is UiEvent.ShowUndoDeleteSnackbar -> {
                     val result = snackBarHostState.showSnackbar(
-                        message = "task deleted successfully",
-                        actionLabel = "Undo",
+                        message = deleteSuccessMessage,
+                        actionLabel = undoActionText,
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
