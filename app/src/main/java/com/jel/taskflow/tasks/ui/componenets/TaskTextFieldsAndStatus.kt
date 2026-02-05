@@ -35,7 +35,6 @@ import com.jel.taskflow.utils.toRelativeTime
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TaskTextFieldsAndStatus(
-    modifier: Modifier = Modifier,
     state: AddEditTaskUiState,
     onTitleChanged: (String) -> Unit,
     onOpenContentFullScreen: () -> Unit,
@@ -118,6 +117,7 @@ fun TaskTextFieldsAndStatus(
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
+            bottomPadding = 50.dp
         )
         Row {
             Text(
