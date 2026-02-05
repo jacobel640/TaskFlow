@@ -1,4 +1,4 @@
-package com.jel.taskflow
+package com.jel.taskflow.di
 
 import android.app.Application
 import androidx.room.Room
