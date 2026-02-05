@@ -27,7 +27,7 @@ class AddEditTaskViewModel @Inject constructor(
         private set
 
     private val uiStatesHistory = mutableListOf<AddEditTaskUiState>()
-    private var uiStateHistoryPosition = 0
+    private var uiStateHistoryPosition = -1
 
     var currentTaskId: Long? = null
 
@@ -39,14 +39,15 @@ class AddEditTaskViewModel @Inject constructor(
                 observeTask(taskId)
             } ?: run {
                 uiState = uiState.copy(isLoading = false)
+                uiStatesHistory.add(++uiStateHistoryPosition, uiState)
             }
     }
 
     private fun observeTask(taskId: Long) {
+        println("LOG observeTask uiStateHistoryPosition: $uiStateHistoryPosition")
         viewModelScope.launch {
             repository.getTaskById(taskId).collect { task ->
                 task?.let {
-                    uiStateHistoryPosition = 0
                     uiState = uiState.copy(
                         title = task.title,
                         content = TextFieldValue(
@@ -63,41 +64,41 @@ class AddEditTaskViewModel @Inject constructor(
                         canUndo = canRevertBackwards(),
                         canRedo = canRevertForwards()
                     )
-                    uiStatesHistory.add(uiState)
+                    if (uiStatesHistory.isEmpty()) {
+                        uiStatesHistory.add(++uiStateHistoryPosition, uiState)
+                    }
+                } ?: run {
+                    // TODO handle non existing taskId case
+                    uiState = uiState.copy(
+                        isLoading = false,
+                        canUndo = canRevertBackwards(),
+                        canRedo = canRevertForwards()
+                    )
                 }
             }
         }
     }
 
     fun onTitleChanged(newTitle: String) {
-        viewModelScope.launch {
-            uiState = uiState.copy(title = newTitle)
-            onCurrentTaskPropertyChanged()
-            updateUiStateHistory()
-        }
+        uiState = uiState.copy(title = newTitle)
+        onCurrentTaskPropertyChanged()
+        updateUiStateHistory()
     }
 
-    fun onContentChanged(newContent: String) {
-        viewModelScope.launch {
-            uiState = uiState.copy(content = newContent)
-            onCurrentTaskPropertyChanged()
-            updateUiStateHistory()
-        }
     fun onContentChanged(newContent: TextFieldValue) {
+        uiState = uiState.copy(content = newContent)
+        onCurrentTaskPropertyChanged()
+        updateUiStateHistory()
     }
 
     fun onStatusChanged(newStatus: Status) {
-        viewModelScope.launch {
-            uiState = uiState.copy(status = newStatus)
-            onCurrentTaskPropertyChanged()
-        }
+        uiState = uiState.copy(status = newStatus)
+        onCurrentTaskPropertyChanged()
     }
 
     fun onPriorityChanged(newPriority: Priority) {
-        viewModelScope.launch {
-            uiState = uiState.copy(priority = newPriority)
-            onCurrentTaskPropertyChanged()
-        }
+        uiState = uiState.copy(priority = newPriority)
+        onCurrentTaskPropertyChanged()
     }
 
     fun onCurrentTaskPropertyChanged() {
@@ -109,7 +110,7 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun updateUiStateHistory() {
         uiStatesHistory.add(++uiStateHistoryPosition, uiState)
-
+        println("LOG updateUiStateHistory uiStateHistoryPosition: $uiStateHistoryPosition")
         uiState = uiState.copy(
             canUndo = canRevertBackwards(),
             canRedo = canRevertForwards()
@@ -122,18 +123,28 @@ class AddEditTaskViewModel @Inject constructor(
     fun revertChanges(forwards: Boolean = false) {
         uiState = if (forwards) getUiTextStateAt(++uiStateHistoryPosition)
         else getUiTextStateAt(--uiStateHistoryPosition)
+        println("LOG revertChanges uiStateHistoryPosition: $uiStateHistoryPosition, forwards: $forwards")
     }
 
-    fun getUiTextStateAt(index: Int): AddEditTaskUiState = uiStatesHistory[index].copy(
-        status = uiState.status,
-        priority = uiState.priority,
-        canUndo = canRevertBackwards(),
-        canRedo = canRevertForwards()
-    )
+    fun getUiTextStateAt(index: Int): AddEditTaskUiState =
+        uiStatesHistory[index].copy(
+            status = uiState.status,
+            priority = uiState.priority,
+            canUndo = canRevertBackwards(),
+            canRedo = canRevertForwards()
+        )
 
     fun reverseChanges() {
+        uiStatesHistory.clear()
+        uiStateHistoryPosition = -1
         currentTaskId?.let {
             observeTask(it)
+        } ?: run {
+            uiState = AddEditTaskUiState(
+                isLoading = false,
+                canUndo = canRevertBackwards(),
+                canRedo = canRevertForwards()
+            )
         }
     }
 
@@ -144,7 +155,7 @@ class AddEditTaskViewModel @Inject constructor(
                 Task(
                     id = currentTaskId,
                     title = uiState.title,
-                    content = uiState.content,
+                    content = uiState.content.text,
                     status = uiState.status,
                     priority = uiState.priority,
                     createdDate = uiState.createdDate,
