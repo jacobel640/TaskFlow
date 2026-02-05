@@ -1,6 +1,9 @@
 package com.jel.taskflow.tasks.ui.componenets
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +18,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,11 +38,9 @@ fun TaskTextFieldsAndStatus(
     modifier: Modifier = Modifier,
     state: AddEditTaskUiState,
     onTitleChanged: (String) -> Unit,
-    onContentChanged: (String) -> Unit,
+    onOpenContentFullScreen: () -> Unit,
     onStatusChanged: (Status) -> Unit,
-    onPriorityChanged: (Priority) -> Unit,
-    onUndo: () -> Unit,
-    onRedo: () -> Unit
+    onPriorityChanged: (Priority) -> Unit
 ) {
 
 //    val imeState = rememberImeState()
@@ -93,6 +97,28 @@ fun TaskTextFieldsAndStatus(
                 onRedo = onRedo
             )
         }
+        ScrollableTextField(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(onClick = onOpenContentFullScreen)
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(pass = PointerEventPass.Initial)
+                        val up = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                        if (up != null) {
+                            onOpenContentFullScreen()
+                        }
+                    }
+                }
+                .focusProperties { canFocus = false },
+            readOnly = true,
+            label = { Text(text = stringResource(R.string.task_content)) },
+            value = state.content,
+            onValueChange = { },
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+        )
         Row {
             Text(
                 text = stringResource(R.string.created_at, state.createdDate.toRelativeTime()),
@@ -116,10 +142,9 @@ fun TaskTextFieldsAndStatusPreview() {
         TaskTextFieldsAndStatus(
             state = AddEditTaskUiState(),
             onTitleChanged = {},
-            onContentChanged = {},
+            onOpenContentFullScreen = {},
             onStatusChanged = {},
-            onPriorityChanged = {},
-            onUndo = {},
-            onRedo = {})
+            onPriorityChanged = {}
+        )
     }
 }

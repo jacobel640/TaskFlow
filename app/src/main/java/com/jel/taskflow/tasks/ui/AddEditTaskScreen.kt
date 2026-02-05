@@ -89,23 +89,30 @@ fun AddEditTaskScreen(viewModel: AddEditTaskViewModel = hiltViewModel()) {
                     .imePadding(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                TaskTextFieldsAndStatus(
-                    modifier = Modifier.padding(10.dp),
-                    state = state,
-                    onTitleChanged = { newTitle ->
-                        viewModel.onTitleChanged(newTitle)
-                    },
-                    onContentChanged = { newContent ->
-                        viewModel.onContentChanged(newContent)
-                    },
-                    onStatusChanged = { newStatus ->
-                        viewModel.onStatusChanged(newStatus)
-                    },
-                    onPriorityChanged = { newPriority ->
-                        viewModel.onPriorityChanged(newPriority)
-                    },
-                    onUndo = { viewModel.revertChanges() },
-                    onRedo = { viewModel.revertChanges(forwards = true) })
+                if (state.isLoading) {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LinearProgressIndicator()
+                    }
+                } else {
+                    TaskTextFieldsAndStatus(
+                        state = state,
+                        onTitleChanged = { newTitle ->
+                            viewModel.onTitleChanged(newTitle)
+                        },
+                        onOpenContentFullScreen = {
+                            navController.navigate(Screen.FullScreenContentEdit.route)
+                            print("### LOG onTap -> onOpenContentFullScreen -> navigate")
+                        },
+                        onStatusChanged = { newStatus ->
+                            viewModel.onStatusChanged(newStatus)
+                        },
+                        onPriorityChanged = { newPriority ->
+                            viewModel.onPriorityChanged(newPriority)
+                        }
+                    )
+                }
             }
         }
     }
