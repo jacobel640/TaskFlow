@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavController) {
+fun TasksListScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavController) {
 
     val tasks = viewModel.tasks.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -167,7 +167,7 @@ fun TasksScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavC
                 onItemClick = { taskId ->
                     taskId?.let {
                         navController.navigate(
-                            route = Screen.TaskScreen.route + "?taskId=${taskId}"
+                            route = Screen.SingleTaskScreen.withIdArg(taskId)
                         )
                     }
                 },

@@ -30,13 +30,14 @@ class AddEditTaskViewModel @Inject constructor(
     var currentTaskId: Long? = null
 
     init {
-        savedStateHandle.get<Long>("taskId")?.let { taskId ->
-            println("taskId=$taskId")
-            if (taskId != -1L) {
+        savedStateHandle.get<Long>("taskId")
+            ?.takeIf { it != -1L }
+            ?.let { taskId ->
                 currentTaskId = taskId
                 observeTask(taskId)
-            } else uiStatesHistory.add(uiState)
-        }
+            } ?: run {
+                uiState = uiState.copy(isLoading = false)
+            }
     }
 
     private fun observeTask(taskId: Long) {

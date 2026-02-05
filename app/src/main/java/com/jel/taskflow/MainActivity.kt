@@ -42,24 +42,19 @@ class MainActivity : ComponentActivity() {
                         TasksScreen(navController = navController)
                     }
                     composable(
-                        route = Screen.TaskScreen.route + "?taskId={taskId}",
+                        route = Screen.SingleTaskScreen.withIdArg(),
                         arguments = listOf(
-                            navArgument(
-                                name = "taskId"
-                            ) {
+                            navArgument(name = TaskScreen.TASK_ID_ARG) {
                                 type = NavType.LongType
-                                defaultValue = -1L
                             }
                         )
                     ) {
-                        TaskScreen(navController = navController)
+                        SingleTaskScreen(navController = navController)
                     }
                     composable(
-                        route = Screen.AddEditTaskScreen.route + "?taskId={taskId}",
+                        route = Screen.AddEditTaskScreen.withIdArg(),
                         arguments = listOf(
-                            navArgument(
-                                name = "taskId"
-                            ) {
+                            navArgument(name = TaskScreen.TASK_ID_ARG) {
                                 type = NavType.LongType
                                 defaultValue = -1L
                             }
@@ -69,7 +64,6 @@ class MainActivity : ComponentActivity() {
                         }
                     ) {
                         // the SavedStateHandle in the AddEditTaskViewModel is injecting the above taskId argument
-                        AddEditTaskScreen()
                         AddEditTaskScreen(navController = navController)
                     }
                     composable(

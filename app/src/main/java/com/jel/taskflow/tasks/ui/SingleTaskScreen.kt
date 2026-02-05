@@ -50,7 +50,7 @@ import com.jel.taskflow.utils.toRelativeTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskScreen(
+fun SingleTaskScreen(
     viewModel: AddEditTaskViewModel = hiltViewModel(),
     navController: NavController
 ) {
@@ -118,7 +118,7 @@ fun TaskScreen(
                 modifier = Modifier.padding(bottom = 10.dp),
                 onClick = {
                     navController.navigate(
-                        Screen.AddEditTaskScreen.route + "?taskId=${viewModel.currentTaskId}"
+                        Screen.AddEditTaskScreen.withIdArg(viewModel.currentTaskId)
                     )
                 },
 

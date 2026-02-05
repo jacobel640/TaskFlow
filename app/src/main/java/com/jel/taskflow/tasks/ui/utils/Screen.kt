@@ -1,8 +1,17 @@
 package com.jel.taskflow.tasks.ui.utils
 
 sealed class Screen(val route: String) {
-    object TasksScreen: Screen(route = "tasks_list_screen")
-    object TaskScreen: Screen(route = "task_screen")
-    object AddEditTaskScreen: Screen(route = "add_edit_task_screen")
+    object TasksListScreen : Screen(route = "tasks_list_screen")
+    object SingleTaskScreen : TaskScreen(baseRoute = "single_task_screen")
+    object AddEditTaskScreen : TaskScreen(baseRoute = "add_edit_task_screen")
     object FullScreenContentEdit : Screen(route = "content_edit_screen")
+}
+
+abstract class TaskScreen(baseRoute: String): Screen(route = baseRoute) {
+    companion object {
+        const val TASK_ID_ARG = "taskId"
+    }
+    fun withIdArg(taskId: Long? = null): String {
+        return taskId?.let { "$route?$TASK_ID_ARG=$it" } ?: "$route?$TASK_ID_ARG={$TASK_ID_ARG}"
+    }
 }
