@@ -3,6 +3,8 @@ package com.jel.taskflow.tasks.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -47,7 +49,10 @@ class AddEditTaskViewModel @Inject constructor(
                     uiStateHistoryPosition = 0
                     uiState = uiState.copy(
                         title = task.title,
-                        content = task.content,
+                        content = TextFieldValue(
+                            text = task.content,
+                            selection = TextRange(task.content.length)
+                        ),
                         status = task.status,
                         priority = task.priority,
                         createdDate = task.createdDate,
@@ -78,6 +83,7 @@ class AddEditTaskViewModel @Inject constructor(
             onCurrentTaskPropertyChanged()
             updateUiStateHistory()
         }
+    fun onContentChanged(newContent: TextFieldValue) {
     }
 
     fun onStatusChanged(newStatus: Status) {

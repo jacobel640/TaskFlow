@@ -155,7 +155,7 @@ fun SingleTaskScreen(
                                 .padding(horizontal = 5.dp)
                                 .padding(top = 25.dp)
                                 .verticalScroll(rememberScrollState()),
-                            text = uiState.content,
+                            text = uiState.content.text,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
