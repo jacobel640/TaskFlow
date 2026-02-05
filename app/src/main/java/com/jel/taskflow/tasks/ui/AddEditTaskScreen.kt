@@ -1,5 +1,6 @@
 package com.jel.taskflow.tasks.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -23,21 +25,27 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.model.AddEditTaskViewModel
 import com.jel.taskflow.tasks.ui.componenets.TaskTextFieldsAndStatus
+import com.jel.taskflow.tasks.ui.utils.Screen
 import com.jel.taskflow.ui.theme.TaskFlowTheme
 import com.jel.taskflow.utils.flatColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditTaskScreen(viewModel: AddEditTaskViewModel = hiltViewModel()) {
-    val state = viewModel.uiState
+fun AddEditTaskScreen(
+    viewModel: AddEditTaskViewModel = hiltViewModel(),
+    navController: NavController
+) {
 
+    val state = viewModel.uiState
     val snackBarHostState = remember { SnackbarHostState() }
 
     DisposableEffect(Unit) {
@@ -53,11 +61,7 @@ fun AddEditTaskScreen(viewModel: AddEditTaskViewModel = hiltViewModel()) {
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(
-                            text =
-                            if (state.editMode) stringResource(R.string.edit_task)
-                            else stringResource(R.string.add_task)
-                        )
+                        Text(text = stringResource(R.string.edit_task))
                     }, colors = TopAppBarDefaults.flatColors()
                 )
             },
@@ -117,12 +121,3 @@ fun AddEditTaskScreen(viewModel: AddEditTaskViewModel = hiltViewModel()) {
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun AddTaskScreenPreview() {
-//    TaskFlowTheme {
-//        AddTaskScreen()
-//    }
-//}

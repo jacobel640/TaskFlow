@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -16,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -42,17 +42,11 @@ fun TaskTextFieldsAndStatus(
     onPriorityChanged: (Priority) -> Unit
 ) {
 
-//    val imeState = rememberImeState()
-//    val scrollState = rememberScrollState()
-//
-//    LaunchedEffect(key1 = imeState.value) {
-//        if (imeState.value) {
-//            scrollState.animateScrollTo(scrollState.maxValue)
-//        }
-//    }
-
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .imePadding()
     ) {
         Row {
             TextField(
@@ -73,29 +67,6 @@ fun TaskTextFieldsAndStatus(
             status = state.status, onStatusChanged = onStatusChanged
         )
         Spacer(modifier = Modifier.padding(vertical = 5.dp))
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            ScrollableTextField(
-                modifier = Modifier.fillMaxSize(),
-                label = { Text(text = stringResource(R.string.task_content)) },
-                value = state.content,
-                onValueChange = onContentChanged,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                bottomPadding = 50.dp
-            )
-            UndoRedoControl(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 5.dp),
-                canUndo = state.canUndo,
-                canRedo = state.canRedo,
-                onUndo = onUndo,
-                onRedo = onRedo
-            )
-        }
         ScrollableTextField(
             modifier = Modifier
                 .fillMaxSize()

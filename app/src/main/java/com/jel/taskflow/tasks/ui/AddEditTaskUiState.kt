@@ -13,7 +13,6 @@ data class AddEditTaskUiState(
     val priority: Priority = Priority.MEDIUM,
     val createdDate: Instant = Clock.System.now(),
     val changedDate: Instant = createdDate,
-    val editMode: Boolean = false,
     val isLoading: Boolean = true,
     val currentTaskChanged: Boolean = false,
     val canUndo: Boolean = false,

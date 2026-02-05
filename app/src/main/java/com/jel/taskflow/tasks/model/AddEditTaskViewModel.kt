@@ -58,7 +58,6 @@ class AddEditTaskViewModel @Inject constructor(
                         priority = task.priority,
                         createdDate = task.createdDate,
                         changedDate = task.changedDate,
-                        editMode = true,
                         isLoading = false,
                         currentTaskChanged = false,
                         canUndo = canRevertBackwards(),

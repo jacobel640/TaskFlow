@@ -31,7 +31,6 @@ class TasksViewModel @Inject constructor(
 
     fun deleteTask(taskId: Long) {
         viewModelScope.launch {
-            if (taskId == -1L) return@launch
             val task = repository.getTaskById(taskId).firstOrNull()
             task?.let {
                 deletedTask = it

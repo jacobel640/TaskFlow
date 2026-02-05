@@ -17,9 +17,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.jel.taskflow.tasks.model.AddEditTaskViewModel
 import com.jel.taskflow.tasks.ui.AddEditTaskScreen
-import com.jel.taskflow.tasks.ui.TaskScreen
+import com.jel.taskflow.tasks.ui.SingleTaskScreen
 import com.jel.taskflow.tasks.ui.utils.Screen
-import com.jel.taskflow.tasks.ui.TasksScreen
+import com.jel.taskflow.tasks.ui.TasksListScreen
 import com.jel.taskflow.tasks.ui.componenets.FullScreenContentEdit
 import com.jel.taskflow.tasks.ui.utils.TaskScreen
 import com.jel.taskflow.ui.theme.TaskFlowTheme
@@ -30,16 +30,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent {
             TaskFlowTheme {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.TasksScreen.route
+                    startDestination = Screen.TasksListScreen.route
                 )  {
-                    composable(route = Screen.TasksScreen.route) {
-                        TasksScreen(navController = navController)
+                    composable(route = Screen.TasksListScreen.route) {
+                        TasksListScreen(navController = navController)
                     }
                     composable(
                         route = Screen.SingleTaskScreen.withIdArg(),

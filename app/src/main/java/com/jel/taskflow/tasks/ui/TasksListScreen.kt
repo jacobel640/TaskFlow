@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -28,8 +28,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -109,26 +111,6 @@ fun TasksListScreen(viewModel: TasksViewModel = hiltViewModel(), navController: 
                 colors = TopAppBarDefaults.flatColors()
             )
         },
-//        bottomBar = {
-//            BottomAppBar(
-//                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-//                contentColor = MaterialTheme.colorScheme.primary,
-//                tonalElevation = 5.dp,
-//                actions = {
-//                    NavigationBarItem(
-//                        selected = true,
-//                        onClick = { },
-//                        label = { Text(text = "Main List") },
-//                        icon = {
-//                            Icon(
-//                                imageVector = Icons.AutoMirrored.Rounded.List,
-//                                contentDescription = null
-//                            )
-//                        }
-//                    )
-//                }
-//            )
-//        },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
@@ -215,7 +197,11 @@ fun ItemsList(
             contentPadding = PaddingValues(top = 8.dp, bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(items = tasks.value) { _, task ->
+            items(
+                items = tasks.value,
+                key = { task -> task.id ?: 0L },
+                contentType = { "task_item" }
+            ) { task ->
                 TaskItem(
                     modifier = Modifier.clickable { onItemClick(task.id) },
                     task = task,
