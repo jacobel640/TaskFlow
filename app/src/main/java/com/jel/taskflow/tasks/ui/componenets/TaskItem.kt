@@ -75,10 +75,10 @@ fun TaskItem(
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
     if (showDeleteConfirmDialog) {
-        DeleteDialog(
+        DeleteConfirmDialog(
             taskTitle = task.title,
             onDismiss = { showDeleteConfirmDialog = false },
-            onConfirm = onDelete
+            onDeleteConfirm = onDelete
         )
     }
 

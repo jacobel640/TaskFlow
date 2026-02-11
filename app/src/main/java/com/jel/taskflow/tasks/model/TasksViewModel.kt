@@ -31,10 +31,9 @@ class TasksViewModel @Inject constructor(
 
     fun deleteTask(taskId: Long) {
         viewModelScope.launch {
-            val task = repository.getTaskById(taskId).firstOrNull()
-            task?.let {
+            repository.getTaskById(taskId).firstOrNull()?.let {
                 deletedTask = it
-                repository.deleteTask(task = it)
+                repository.deleteTask(it)
                 _uiEvent.send(UiEvent.ShowUndoDeleteSnackbar)
             } ?: run {
                 _uiEvent.send(UiEvent.ShowDeleteFailedSnackbar("cannot find task with id: $taskId"))

@@ -14,9 +14,9 @@ import com.jel.taskflow.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteDialog(
+fun DeleteConfirmDialog(
     taskTitle: String,
-    onConfirm: () -> Unit,
+    onDeleteConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -35,7 +35,7 @@ fun DeleteDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(onClick = onDeleteConfirm) {
                 Text(text = stringResource(R.string.delete_confirm_dialog_action_confirm))
             }
         },

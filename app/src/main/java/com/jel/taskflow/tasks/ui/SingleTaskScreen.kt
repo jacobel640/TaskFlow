@@ -42,7 +42,7 @@ import com.jel.taskflow.tasks.model.AddEditTaskViewModel
 import com.jel.taskflow.tasks.model.enums.extensions.color
 import com.jel.taskflow.tasks.model.enums.extensions.containerColor
 import com.jel.taskflow.tasks.model.enums.extensions.labelRes
-import com.jel.taskflow.tasks.ui.componenets.DeleteDialog
+import com.jel.taskflow.tasks.ui.componenets.DeleteConfirmDialog
 import com.jel.taskflow.tasks.ui.componenets.StatusGroupButtons
 import com.jel.taskflow.tasks.ui.utils.Screen
 import com.jel.taskflow.utils.toRelativeTime
@@ -57,10 +57,10 @@ fun SingleTaskScreen(
     var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showDeleteConfirmDialog) {
-        DeleteDialog(
+        DeleteConfirmDialog(
             taskTitle = uiState.title,
             onDismiss = { showDeleteConfirmDialog = false },
-            onConfirm = {
+            onDeleteConfirm = {
                 viewModel.currentTaskId.let { currentTaskId ->
                     showDeleteConfirmDialog = false
                     navController.previousBackStackEntry
