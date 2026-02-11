@@ -38,7 +38,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,7 +66,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 fun TasksListScreen(viewModel: TasksViewModel = hiltViewModel(), navController: NavController) {
 
-    val tasks = viewModel.tasks.collectAsStateWithLifecycle()
+    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     var firstListItemShown by rememberSaveable { mutableStateOf(false) }
 
@@ -171,7 +170,7 @@ fun TasksListScreen(viewModel: TasksViewModel = hiltViewModel(), navController: 
 @Composable
 fun ItemsList(
     modifier: Modifier = Modifier,
-    tasks: State<List<Task>>,
+    tasks: List<Task>,
     onItemClick: (Long?) -> Unit,
     deleteTaskClick: (Task) -> Unit,
     onListScroll: (Boolean) -> Unit
@@ -200,7 +199,7 @@ fun ItemsList(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(
-                items = tasks.value,
+                items = tasks,
                 key = { task -> task.id ?: 0L },
                 contentType = { "task_item" }
             ) { task ->
