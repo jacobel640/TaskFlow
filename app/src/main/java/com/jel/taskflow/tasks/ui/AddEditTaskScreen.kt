@@ -30,19 +30,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.model.AddEditTaskViewModel
 import com.jel.taskflow.tasks.ui.componenets.TaskTextFieldsAndStatus
-import com.jel.taskflow.tasks.ui.utils.Screen
 import com.jel.taskflow.ui.theme.TaskFlowTheme
 import com.jel.taskflow.utils.flatColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTaskScreen(
-    viewModel: AddEditTaskViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: AddEditTaskViewModel = hiltViewModel()
 ) {
 
     val state = viewModel.uiState
@@ -105,16 +102,17 @@ fun AddEditTaskScreen(
                         onTitleChanged = { newTitle ->
                             viewModel.onTitleChanged(newTitle)
                         },
-                        onOpenContentFullScreen = {
-                            navController.navigate(Screen.FullScreenContentEdit.route)
-                            print("### LOG onTap -> onOpenContentFullScreen -> navigate")
+                        onContentChanged = { newContent ->
+                            viewModel.onContentChanged(newContent)
                         },
                         onStatusChanged = { newStatus ->
                             viewModel.onStatusChanged(newStatus)
                         },
                         onPriorityChanged = { newPriority ->
                             viewModel.onPriorityChanged(newPriority)
-                        }
+                        },
+                        onUndo = viewModel::revertChanges,
+                        onRedo = { viewModel.revertChanges(true) }
                     )
                 }
             }
