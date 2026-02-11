@@ -85,9 +85,12 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     fun onContentChanged(newContent: TextFieldValue) {
+        val currentContentText = uiState.content.text
         uiState = uiState.copy(content = newContent)
-        onCurrentTaskPropertyChanged()
-        updateUiStateHistory()
+        if (currentContentText != newContent.text) {
+            onCurrentTaskPropertyChanged()
+            updateUiStateHistory()
+        }
     }
 
     fun onStatusChanged(newStatus: Status) {
