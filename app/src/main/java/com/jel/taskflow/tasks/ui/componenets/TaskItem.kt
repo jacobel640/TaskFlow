@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.tasks.model.Task
 import com.jel.taskflow.tasks.model.enums.Priority
+import com.jel.taskflow.tasks.model.enums.Status
 import com.jel.taskflow.tasks.model.enums.extensions.color
 import com.jel.taskflow.tasks.model.enums.extensions.containerColor
 import com.jel.taskflow.tasks.model.enums.extensions.imageVector
@@ -50,7 +51,7 @@ import com.jel.taskflow.ui.theme.TaskFlowTheme
 
 val ColorScheme.collapsedColor: Color
     @Composable
-    get() = this.primaryContainer.copy(alpha = 0.5f).compositeOver(this.background)
+    get() = primaryContainer.copy(alpha = 0.5f).compositeOver(background)
 
 @Composable
 fun TaskItem(
@@ -89,34 +90,30 @@ fun TaskItem(
         tonalElevation = elevation,
         shadowElevation = elevation
     ) {
-        Row(Modifier.padding(start = 15.dp, top = 10.dp)) {
-            IndicatorChip(
-                label = stringResource(task.status.labelRes),
-                imageVector = task.status.imageVector,
-                color = task.status.color,
-                containerColor = task.status.containerColor
-            )
-            Spacer(Modifier.padding(horizontal = 2.dp))
-            IndicatorChip(
-                label = stringResource(task.priority.labelRes),
-                color = task.priority.color,
-                containerColor = task.priority.containerColor
-            )
-        }
         Column(
             modifier = Modifier
-                .padding(16.dp)
                 .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Row {
-                Text(
+                Column(
                     modifier = Modifier
+                        .align(Alignment.CenterVertically)
                         .weight(1f)
-                        .align(Alignment.CenterVertically),
-                    text = task.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                IconButton(onClick = onExpandedClicked) {
+                ) {
+                    TopIndicationChips(
+                        status = task.status,
+                        priority = task.priority
+                    )
+                    Text(
+                        text = task.title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    onClick = onExpandedClicked
+                ) {
                     if (expanded) {
                         Icon(
                             imageVector = Icons.Rounded.KeyboardArrowUp,
@@ -141,23 +138,7 @@ fun TaskItem(
 
             ) {
                 Column {
-                    Surface(
-                        modifier = Modifier.padding(top = 8.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .fillMaxWidth(),
-                            text = task.content,
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = 10,
-                            overflow = TextOverflow.Ellipsis,
-                            softWrap = true
-                        )
-                    }
-                    Spacer(Modifier.padding(vertical = 5.dp))
+                    ContentText(content = task.content)
                     Row(Modifier.fillMaxWidth()) {
                         IconButton(
                             modifier = Modifier
@@ -180,34 +161,71 @@ fun TaskItem(
     }
 }
 
-@Preview
+@Composable
+fun TopIndicationChips(
+    modifier: Modifier = Modifier,
+    status: Status,
+    priority: Priority) {
+    Row {
+        IndicatorChip(
+            label = stringResource(status.labelRes),
+            imageVector = status.imageVector,
+            color = status.color,
+            containerColor = status.containerColor
+        )
+        Spacer(Modifier.padding(horizontal = 2.dp))
+        IndicatorChip(
+            label = stringResource(priority.labelRes),
+            color = priority.color,
+            containerColor = priority.containerColor
+        )
+    }
+}
+
+@Composable
+fun ContentText(content: String) {
+    Column {
+        Surface(
+            modifier = Modifier.padding(top = 8.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .fillMaxWidth(),
+                text = content,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 10,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = true
+            )
+        }
+        Spacer(Modifier.padding(vertical = 5.dp))
+    }
+}
+
+@Preview(name = "expended = true")
 @Composable
 fun TaskItemPreview() {
     TaskFlowTheme {
-        Column {
-            Text(
-                text = "expended = true",
-                color = Color.Gray,
-                modifier = Modifier.padding(top = 10.dp, start = 10.dp)
-            )
-            TaskItem(
-                task = Task(title = "title", content = "content", priority = Priority.HIGH),
-                expanded = true,
-                onExpandedClicked = {},
-                onDelete = {}
-            )
-            Text(
-                text = "expended = false",
-                color = Color.Gray,
-                modifier = Modifier.padding(top = 10.dp, start = 10.dp)
-            )
-            TaskItem(
-                task = Task(title = "title", content = "content"),
-                expanded = false,
-                onExpandedClicked = {},
-                onDelete = {}
-            )
-            Spacer(modifier = Modifier.padding(top = 10.dp))
-        }
+        TaskItem(
+            task = Task(title = "title", content = "content", priority = Priority.HIGH),
+            expanded = true,
+            onExpandedClicked = {},
+            onDelete = {})
+    }
+}
+
+@Preview(name = "expended = false")
+@Composable
+fun TaskItemNotExpendedPreview() {
+    TaskFlowTheme {
+        TaskItem(
+            task = Task(title = "title", content = "content"),
+            expanded = false,
+            onExpandedClicked = {},
+            onDelete = {}
+        )
     }
 }
