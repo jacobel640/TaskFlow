@@ -151,7 +151,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     fun shouldSaveTask(): Boolean =
-        uiState.currentTaskChanged || currentTaskId == null &&
+        (uiState.currentTaskChanged || currentTaskId == null) &&
                 (uiState.title.isNotBlank() || uiState.content.text.isNotBlank())
 
     fun saveTask() {
