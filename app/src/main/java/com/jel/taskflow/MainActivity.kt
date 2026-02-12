@@ -10,12 +10,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.jel.taskflow.tasks.ui.AddEditTaskScreen
-import com.jel.taskflow.tasks.ui.SingleTaskScreen
-import com.jel.taskflow.tasks.ui.TasksListScreen
-import com.jel.taskflow.tasks.ui.utils.Screen
-import com.jel.taskflow.tasks.ui.utils.TaskScreen
-import com.jel.taskflow.ui.theme.TaskFlowTheme
+import com.jel.taskflow.tasks.presentation.task.AddEditTaskScreen
+import com.jel.taskflow.tasks.presentation.task.SingleTaskScreen
+import com.jel.taskflow.tasks.presentation.home.HomeScreen
+import com.jel.taskflow.core.utils.Screen
+import com.jel.taskflow.core.utils.TaskScreen
+import com.jel.taskflow.core.theme.TaskFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,10 +30,10 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.TasksListScreen.route
+                    startDestination = Screen.HomeScreen.route
                 )  {
-                    composable(route = Screen.TasksListScreen.route) {
-                        TasksListScreen(navController = navController)
+                    composable(route = Screen.HomeScreen.route) {
+                        HomeScreen(navController = navController)
                     }
                     composable(
                         route = Screen.SingleTaskScreen.withIdArg(),

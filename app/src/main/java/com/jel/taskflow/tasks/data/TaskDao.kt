@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.jel.taskflow.tasks.model.Task
+import com.jel.taskflow.tasks.domain.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao

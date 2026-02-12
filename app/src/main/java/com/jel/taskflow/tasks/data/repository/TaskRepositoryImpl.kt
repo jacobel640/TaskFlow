@@ -1,8 +1,8 @@
 package com.jel.taskflow.tasks.data.repository
 
 import com.jel.taskflow.tasks.data.TaskDao
-import com.jel.taskflow.tasks.model.Task
-import com.jel.taskflow.tasks.repository.TaskRepository
+import com.jel.taskflow.tasks.domain.Task
+import com.jel.taskflow.tasks.domain.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
