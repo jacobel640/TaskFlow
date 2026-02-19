@@ -23,31 +23,28 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskDatabase(app: Application): AppDatabase {
-        return Room.databaseBuilder(
+    fun provideTaskDatabase(app: Application): AppDatabase =
+        Room.databaseBuilder(
             app,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-//            .addMigrations(TaskDatabase.MIGRATION_1_2)
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .build()
-    }
 
     @Provides
     @Singleton
-    fun provideTaskRepository(appDatabase: AppDatabase): TaskRepository {
-        return TaskRepositoryImpl(appDatabase.taskDao)
-    }
+    fun provideTaskRepository(appDatabase: AppDatabase): TaskRepository =
+        TaskRepositoryImpl(appDatabase.taskDao)
 
     @Provides
     @Singleton
-    fun provideTaskUseCases(repository: TaskRepository): TaskUseCases {
-        return TaskUseCases(
+    fun provideTaskUseCases(repository: TaskRepository): TaskUseCases =
+        TaskUseCases(
             getFilteredTasks = GetFilteredTasks(repository),
             getTask = GetTask(repository),
             insertTask = InsertTask(repository),
             deleteTask = DeleteTask(repository),
             getTasksCount = GetTasksCount(repository)
         )
-    }
 }
