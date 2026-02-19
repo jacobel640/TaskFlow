@@ -37,7 +37,7 @@ fun StatusGroupButtons(
         modifier = Modifier
             .padding(horizontal = 15.dp)
             .padding(top = 10.dp),
-        text = stringResource(R.string.task_progress),
+        text = stringResource(R.string.status),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.outline,
     )

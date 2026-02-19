@@ -5,6 +5,7 @@
     <string name="edit_task">עריכת משימה</string>
     <string name="title">כותרת</string>
     <string name="task_content">תוכן משימה</string>
+    <string name="date_updated">תאריך עריכה</string>
     <string name="created_at">נוצר: %1$s</string>
     <string name="updated_at">עודכן: %1$s</string>
     <string name="priority">עדיפות</string>
@@ -14,11 +15,25 @@
     <string name="priority_low">נמוכה</string>
     <string name="priority_medium">בינונית</string>
     <string name="priority_high">גבוהה</string>
-    <string name="task_progress">מצב המשימה</string>
+    <string name="status">סטטוס</string>
     <string name="delete_confirm_dialog_message">האם אתה בטוח שאתה רוצה למחוק את %1$s?</string>
     <string name="delete_confirm_dialog_title">אישור מחיקת משימה</string>
     <string name="delete_confirm_dialog_action_confirm">אישור</string>
     <string name="delete_confirm_dialog_action_cancel">ביטול</string>
     <string name="task_deleted_successfully_message">משימה נמחקה בהצלחה</string>
     <string name="undo_action">בטל</string>
+    <string name="date_created">תאריך יצירה</string>
+    <string name="task_search">חיפוש משימה</string>
+    <string name="hide_filters">הסתר סינונים</string>
+    <string name="show_filters">הצג סינונים</string>
+    <string name="priorities">עדיפויות:</string>
+    <string name="all_priorities">כל העדיפויות</string>
+    <string name="statuses">סטטוסים:</string>
+    <string name="all_statuses">כל הסטטוסים</string>
+    <string name="show_completed_tasks">מציג משימות שהושלמו</string>
+    <string name="hiding_completed_tasks">מסתיר משימות שהושלמו</string>
+    <string name="no_tasks_greeting">נראה ריק פה…\nבוא נוסיף משימה חדשה!</string>
+    <string name="create_new_task">צור משימה חדשה</string>
+    <string name="clear_filters">נקה פילטרים</string>
+    <string name="empty_tasks_filters_results">לא נמצאו משימות תחת הפילטרים האלו…</string>
 </resources>

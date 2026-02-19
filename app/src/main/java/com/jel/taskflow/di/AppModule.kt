@@ -5,6 +5,12 @@ import androidx.room.Room
 import com.jel.taskflow.core.data.AppDatabase
 import com.jel.taskflow.tasks.data.repository.TaskRepositoryImpl
 import com.jel.taskflow.tasks.domain.repository.TaskRepository
+import com.jel.taskflow.tasks.domain.use_case.DeleteTask
+import com.jel.taskflow.tasks.domain.use_case.GetFilteredTasks
+import com.jel.taskflow.tasks.domain.use_case.GetTask
+import com.jel.taskflow.tasks.domain.use_case.GetTasksCount
+import com.jel.taskflow.tasks.domain.use_case.InsertTask
+import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,5 +39,15 @@ object AppModule {
         return TaskRepositoryImpl(appDatabase.taskDao)
     }
 
-    // provide use cases
+    @Provides
+    @Singleton
+    fun provideTaskUseCases(repository: TaskRepository): TaskUseCases {
+        return TaskUseCases(
+            getFilteredTasks = GetFilteredTasks(repository),
+            getTask = GetTask(repository),
+            insertTask = InsertTask(repository),
+            deleteTask = DeleteTask(repository),
+            getTasksCount = GetTasksCount(repository)
+        )
+    }
 }
