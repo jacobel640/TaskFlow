@@ -5,12 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -60,6 +62,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
 import com.jel.taskflow.core.components.AnimatedSelector
@@ -285,7 +288,7 @@ fun SortDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Box(contentAlignment = Alignment.BottomEnd) {
         TextButton(
             contentPadding = PaddingValues(
                 horizontal = 5.dp
@@ -302,43 +305,43 @@ fun SortDropdown(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
-        MaterialTheme(
-            shapes = MaterialTheme.shapes.copy(extraSmall = dropDownWindowShape),
-        ) {
-            val selectionState = rememberDropdownSelectionState(selectedValue, items)
+        Box(modifier = Modifier.size(0.dp)) { // workaround to keep the popUp aligned to the end of the button
+            MaterialTheme(shapes = MaterialTheme.shapes.copy(extraSmall = dropDownWindowShape)) {
+                val selectionState = rememberDropdownSelectionState(selectedValue, items)
 
-            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                CompositionLocalProvider(LocalRippleConfiguration provides null) {
-                    Box {
-                        AnimatedSelector(selectionState, shape = dropDownItemShape)
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                        Box(modifier = Modifier.width(IntrinsicSize.Max)) {
+                            AnimatedSelector(selectionState, shape = dropDownItemShape)
 
-                        Column {
-                            items.forEachIndexed { index, item ->
-                                val selected = item == selectedValue
-                                DropdownMenuItem(
-                                    modifier = Modifier
-                                        .padding(horizontal = 5.dp)
-                                        .onGloballyPositioned {
-                                            selectionState.onItemLayout(
-                                                index,
-                                                it
+                            Column {
+                                items.forEachIndexed { index, item ->
+                                    val selected = item == selectedValue
+                                    DropdownMenuItem(
+                                        modifier = Modifier
+                                            .padding(horizontal = 5.dp)
+                                            .onGloballyPositioned {
+                                                selectionState.onItemLayout(
+                                                    index,
+                                                    it
+                                                )
+                                            }
+                                            .clip(dropDownItemShape),
+                                        text = {
+                                            Text(
+                                                text = stringResource(item.labelRes),
+                                                color = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified
                                             )
+                                        },
+                                        onClick = {
+                                            onValueSelected(item)
+                                            coroutineScope.launch {
+                                                delay(700)
+                                                expanded = false
+                                            }
                                         }
-                                        .clip(dropDownItemShape),
-                                    text = {
-                                        Text(
-                                            text = stringResource(item.labelRes),
-                                            color = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified
-                                        )
-                                    },
-                                    onClick = {
-                                        onValueSelected(item)
-                                        coroutineScope.launch {
-                                            delay(700)
-                                            expanded = false
-                                        }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
