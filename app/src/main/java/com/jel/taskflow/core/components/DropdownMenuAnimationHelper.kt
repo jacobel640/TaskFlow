@@ -35,13 +35,12 @@ fun <T> rememberDropdownSelectionState(
     items: List<T>
 ): DropdownSelectionState<T> {
     val density = LocalDensity.current
-    return remember(items) { DropdownSelectionState(selectedValue, items, density) }.apply {
+    return remember(items) { DropdownSelectionState(items, density) }.apply {
         UpdateSelected(selectedValue)
     }
 }
 
 class DropdownSelectionState<T>(
-    initialSelected: T,
     private val items: List<T>,
     private val density: Density
 ) {
@@ -49,7 +48,6 @@ class DropdownSelectionState<T>(
     var itemHeightPx by mutableFloatStateOf(0f)
     private val itemPositionsY = mutableStateMapOf<Int, Float>()
     private var initialJumpDone by mutableStateOf(false)
-    private var currentIndex = items.indexOf(initialSelected)
 
     @Composable
     fun UpdateSelected(newValue: T) {

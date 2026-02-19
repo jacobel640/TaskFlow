@@ -3,10 +3,6 @@ package com.jel.taskflow.tasks.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jel.taskflow.tasks.domain.model.Task
-import com.jel.taskflow.tasks.domain.model.enums.Priority
-import com.jel.taskflow.tasks.domain.model.enums.SortDirection
-import com.jel.taskflow.tasks.domain.model.enums.SortType
-import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,59 +95,6 @@ class HomeViewModel @Inject constructor(
             is HomeUiActions.OnSortDirectionChange -> viewModelScope.launch {
                 userPreferencesRepository.updateSortDirection(uiActions.direction)
             }
-        }
-    }
-
-    fun onSortTypeChanged(sortType: SortType) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateSortType(sortType)
-        }
-    }
-
-    fun onSortDirectionChanged(sortDirection: SortDirection) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateSortDirection(sortDirection)
-        }
-    }
-
-    fun onFilterByPriorityChanged(priority: Priority) {
-        viewModelScope.launch {
-            userPreferencesRepository.togglePriorityFilter(priority)
-        }
-    }
-
-    fun onFilterByStatusChanged(status: Status) {
-        viewModelScope.launch {
-            userPreferencesRepository.toggleStatusFilter(status)
-        }
-    }
-
-    fun onShowCompletedTasksChanged(showCompletedTasks: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.toggleShowCompletedTasks(showCompletedTasks)
-        }
-    }
-
-    fun onClearPriorityFilters() {
-        viewModelScope.launch {
-            userPreferencesRepository.clearPriorityFilters()
-        }
-    }
-
-    fun onClearStatusFilters() {
-        viewModelScope.launch {
-            userPreferencesRepository.clearStatusFilters()
-        }
-    }
-
-    fun onSearchQueryChanged(query: String) {
-        _searchQuery.value = query
-    }
-
-    fun onClearFilters() {
-        viewModelScope.launch {
-            _searchQuery.value = ""
-            userPreferencesRepository.clearFilters()
         }
     }
 
