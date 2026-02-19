@@ -1,13 +1,10 @@
 package com.jel.taskflow.tasks.presentation.home
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -40,18 +37,17 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.jel.taskflow.core.components.IndicatorChip
+import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
-import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
 import com.jel.taskflow.tasks.presentation.extensions.imageVector
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
-import com.jel.taskflow.core.theme.TaskFlowTheme
 
 val ColorScheme.collapsedColor: Color
     @Composable
@@ -90,11 +86,16 @@ fun TaskItem(
     }
 
     Surface(
-        modifier = modifier,
         modifier = modifier
             .clip(shape = itemShape)
             .clickable(
                 onClick = onClick
+            )
+            .animateContentSize(
+                spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
             ),
         color = animatedColor,
         shape = itemShape,
@@ -138,16 +139,7 @@ fun TaskItem(
                     }
                 }
             }
-            val animationSpec: FiniteAnimationSpec<IntSize> = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-            AnimatedVisibility(
-                visible = expanded,
-                enter = expandVertically(animationSpec),
-                exit = shrinkVertically(animationSpec)
-
-            ) {
+            if (expanded) {
                 Column {
                     ContentText(content = task.content)
                     Row(Modifier.fillMaxWidth()) {
