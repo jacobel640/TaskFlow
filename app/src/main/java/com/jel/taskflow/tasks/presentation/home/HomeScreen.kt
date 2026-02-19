@@ -305,14 +305,13 @@ fun TasksList(
             contentType = { "task_item" }
         ) { task ->
             TaskItem(
-                modifier = Modifier
-                    .animateItem()
-                    .clickable { task.id?.let { onNavigateToTaskDetails(it) } },
+                modifier = Modifier.animateItem(),
                 task = task,
                 expanded = (task == expandedItem),
                 onExpandedClicked = {
                     expandedItem = if (expandedItem == task) null else task
                 },
+                onClick = { task.id?.let { onNavigateToTaskDetails(it) } },
                 onDelete = { deleteTaskClick(task) }
             )
         }

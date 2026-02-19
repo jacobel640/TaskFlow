@@ -9,12 +9,14 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -61,7 +63,9 @@ fun TaskItem(
     task: Task,
     expanded: Boolean = false,
     onExpandedClicked: () -> Unit,
-    onDelete: () -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    itemShape: CornerBasedShape = MaterialTheme.shapes.medium
 ) {
     val elevation by animateDpAsState(
         targetValue = if (expanded) 4.dp else 0.dp
@@ -87,8 +91,13 @@ fun TaskItem(
 
     Surface(
         modifier = modifier,
+        modifier = modifier
+            .clip(shape = itemShape)
+            .clickable(
+                onClick = onClick
+            ),
         color = animatedColor,
-        shape = MaterialTheme.shapes.medium,
+        shape = itemShape,
         tonalElevation = elevation,
         shadowElevation = elevation
     ) {
@@ -214,6 +223,7 @@ fun TaskItemPreview() {
             task = Task(title = "title", content = "content", priority = Priority.HIGH),
             expanded = true,
             onExpandedClicked = {},
+            onClick = {},
             onDelete = {})
     }
 }
@@ -226,6 +236,7 @@ fun TaskItemNotExpendedPreview() {
             task = Task(title = "title", content = "content"),
             expanded = false,
             onExpandedClicked = {},
+            onClick = {},
             onDelete = {}
         )
     }
