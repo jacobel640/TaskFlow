@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.room.Room
 import com.jel.taskflow.core.data.AppDatabase
 import com.jel.taskflow.tasks.data.repository.TaskRepositoryImpl
-import com.jel.taskflow.tasks.domain.TaskRepository
 import com.jel.taskflow.tasks.domain.repository.TaskRepository
 import dagger.Module
 import dagger.Provides
