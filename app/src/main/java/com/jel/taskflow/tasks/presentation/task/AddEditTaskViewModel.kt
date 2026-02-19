@@ -8,10 +8,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jel.taskflow.tasks.domain.Task
-import com.jel.taskflow.tasks.domain.enums.Priority
-import com.jel.taskflow.tasks.domain.enums.Status
-import com.jel.taskflow.tasks.domain.TaskRepository
+import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.domain.model.enums.Priority
+import com.jel.taskflow.tasks.domain.model.enums.Status
+import com.jel.taskflow.tasks.domain.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -3,6 +3,9 @@ package com.jel.taskflow.tasks.data.repository
 import com.jel.taskflow.tasks.data.TaskDao
 import com.jel.taskflow.tasks.domain.Task
 import com.jel.taskflow.tasks.domain.TaskRepository
+import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.domain.model.enums.Status
+import com.jel.taskflow.tasks.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

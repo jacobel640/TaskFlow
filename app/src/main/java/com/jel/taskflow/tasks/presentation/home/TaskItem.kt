@@ -40,9 +40,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.jel.taskflow.tasks.domain.Task
-import com.jel.taskflow.tasks.domain.enums.Priority
-import com.jel.taskflow.tasks.domain.enums.Status
+import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.domain.model.enums.Priority
+import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
 import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.tasks.presentation.extensions.color

@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jel.taskflow.tasks.data.TaskDao
-import com.jel.taskflow.tasks.domain.Task
+import com.jel.taskflow.tasks.domain.model.Task
 
 @Database(
     entities = [Task::class],

@@ -58,6 +58,7 @@ import com.jel.taskflow.tasks.domain.Task
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.flatColors
+import com.jel.taskflow.tasks.domain.model.Task
 import kotlinx.coroutines.launch
 
 @Composable

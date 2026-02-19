@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.domain.enums.Priority
+import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
 import com.jel.taskflow.tasks.presentation.extensions.labelRes

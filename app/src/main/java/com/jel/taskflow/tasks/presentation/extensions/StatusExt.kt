@@ -10,7 +10,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.domain.enums.Status
+import com.jel.taskflow.tasks.domain.model.enums.Status
 
 val Status.labelRes: Int
     get() = when (this) {

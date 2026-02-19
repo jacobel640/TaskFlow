@@ -1,9 +1,9 @@
-package com.jel.taskflow.tasks.domain
+package com.jel.taskflow.tasks.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.jel.taskflow.tasks.domain.enums.Priority
-import com.jel.taskflow.tasks.domain.enums.Status
+import com.jel.taskflow.tasks.domain.model.enums.Priority
+import com.jel.taskflow.tasks.domain.model.enums.Status
 import kotlin.time.Clock
 import kotlin.time.Instant
 

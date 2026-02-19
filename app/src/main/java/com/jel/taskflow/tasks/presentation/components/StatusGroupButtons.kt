@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.domain.enums.Status
+import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

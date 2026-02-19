@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.domain.enums.Priority
+import com.jel.taskflow.tasks.domain.model.enums.Priority
 
 val Priority.labelRes: Int
     get() =
