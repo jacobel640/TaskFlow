@@ -31,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.presentation.components.TaskTextFieldsAndStatus
+import com.jel.taskflow.tasks.presentation.components.TaskContent
 import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.flatColors
 
@@ -96,7 +96,7 @@ fun AddEditTaskScreen(
                         LinearProgressIndicator()
                     }
                 } else {
-                    TaskTextFieldsAndStatus(
+                    TaskContent(
                         state = state,
                         onTitleChanged = { newTitle ->
                             viewModel.onTitleChanged(newTitle)

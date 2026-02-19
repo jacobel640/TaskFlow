@@ -39,7 +39,7 @@ import com.jel.taskflow.core.utils.toRelativeTime
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun TaskTextFieldsAndStatus(
+fun TaskContent(
     state: AddEditTaskUiState,
     onTitleChanged: (String) -> Unit,
     onContentChanged: (TextFieldValue) -> Unit,
@@ -149,9 +149,9 @@ fun ContentTextField(
 
 @Preview
 @Composable
-fun TaskTextFieldsAndStatusPreview() {
+fun TaskContentPreview() {
     TaskFlowTheme {
-        TaskTextFieldsAndStatus(
+        TaskContent(
             state = AddEditTaskUiState(),
             onTitleChanged = {},
             onContentChanged = {},
