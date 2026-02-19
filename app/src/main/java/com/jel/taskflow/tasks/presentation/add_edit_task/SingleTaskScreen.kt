@@ -1,4 +1,4 @@
-package com.jel.taskflow.tasks.presentation.task
+package com.jel.taskflow.tasks.presentation.add_edit_task
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +42,7 @@ import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
 import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
-import com.jel.taskflow.tasks.presentation.components.StatusGroupButtons
+import com.jel.taskflow.tasks.presentation.add_edit_task.components.StatusGroupButtons
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.toRelativeTime
 

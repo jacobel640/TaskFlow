@@ -1,4 +1,4 @@
-package com.jel.taskflow.tasks.presentation.components
+package com.jel.taskflow.tasks.presentation.add_edit_task.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
@@ -33,7 +33,7 @@ import com.jel.taskflow.R
 import com.jel.taskflow.core.components.ScrollableTextField
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
-import com.jel.taskflow.tasks.presentation.task.AddEditTaskUiState
+import com.jel.taskflow.tasks.presentation.add_edit_task.AddEditTaskUiState
 import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.toRelativeTime
 

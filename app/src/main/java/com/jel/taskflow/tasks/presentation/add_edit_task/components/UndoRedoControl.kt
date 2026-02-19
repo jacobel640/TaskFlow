@@ -1,4 +1,4 @@
-package com.jel.taskflow.tasks.presentation.components
+package com.jel.taskflow.tasks.presentation.add_edit_task.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row

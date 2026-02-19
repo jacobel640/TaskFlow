@@ -1,4 +1,4 @@
-package com.jel.taskflow.tasks.presentation.task
+package com.jel.taskflow.tasks.presentation.add_edit_task
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jel.taskflow.R
-import com.jel.taskflow.tasks.presentation.components.TaskContent
+import com.jel.taskflow.tasks.presentation.add_edit_task.components.TaskContent
 import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.flatColors
 

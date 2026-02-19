@@ -10,8 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.jel.taskflow.tasks.presentation.task.AddEditTaskScreen
-import com.jel.taskflow.tasks.presentation.task.SingleTaskScreen
+import com.jel.taskflow.tasks.presentation.add_edit_task.AddEditTaskScreen
+import com.jel.taskflow.tasks.presentation.add_edit_task.SingleTaskScreen
 import com.jel.taskflow.tasks.presentation.home.HomeScreen
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.TaskScreen
