@@ -2,6 +2,7 @@ package com.jel.taskflow.tasks.presentation.add_edit_task.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -26,8 +27,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
+import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
@@ -42,32 +45,33 @@ fun PriorityDropDown(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    Box(modifier = Modifier.width(IntrinsicSize.Max)) {
+    Box(modifier = modifier.width(IntrinsicSize.Max)) {
         ExposedDropdownMenuBox(
-            modifier = modifier.padding(top = 10.dp),
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }) {
-            Text(
-                text = stringResource(R.string.priority),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.offset(x = 10.dp, y = (-10).dp)
-            )
-            AssistChip(
-                label = {
-                    Text(
-                        text = stringResource(priority.labelRes),
-                        color = priority.color
-                    )
-                },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = priority.containerColor,
-                    labelColor = priority.color,
-                    trailingIconContentColor = priority.color
-                ),
-                modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                onClick = {})
+            Column {
+                Text(
+                    text = stringResource(R.string.priority),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.offset(x = 10.dp, y = (5).dp)
+                )
+                AssistChip(
+                    label = {
+                        Text(
+                            text = stringResource(priority.labelRes),
+                            color = priority.color
+                        )
+                    },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = priority.containerColor,
+                        labelColor = priority.color,
+                        trailingIconContentColor = priority.color
+                    ),
+                    modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                    onClick = {})
+            }
 
             MaterialTheme(
                 shapes = MaterialTheme.shapes.copy(extraSmall = MaterialTheme.shapes.medium)
@@ -105,5 +109,17 @@ fun PriorityDropDown(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun PriorityDropDownPreview() {
+    TaskFlowTheme {
+        var priority = Priority.MEDIUM
+        PriorityDropDown(
+            priority = priority,
+            onPriorityChanged = { priority = it }
+        )
     }
 }

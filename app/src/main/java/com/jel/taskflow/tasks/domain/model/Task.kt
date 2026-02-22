@@ -15,6 +15,7 @@ data class Task(
     val content: String,
     val status: Status = Status.TODO,
     val priority: Priority = Priority.MEDIUM,
+    val dueDate: Instant? = null,
     val createdDate: Instant = Clock.System.now(),
     val changedDate: Instant = createdDate
 )

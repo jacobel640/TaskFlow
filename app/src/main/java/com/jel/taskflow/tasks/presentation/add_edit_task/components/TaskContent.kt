@@ -1,6 +1,7 @@
 package com.jel.taskflow.tasks.presentation.add_edit_task.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -31,11 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.R
 import com.jel.taskflow.core.components.ScrollableTextField
+import com.jel.taskflow.core.theme.TaskFlowTheme
+import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.add_edit_task.AddEditTaskUiState
-import com.jel.taskflow.core.theme.TaskFlowTheme
-import com.jel.taskflow.core.utils.toRelativeTime
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -45,6 +47,7 @@ fun TaskContent(
     onContentChanged: (TextFieldValue) -> Unit,
     onStatusChanged: (Status) -> Unit,
     onPriorityChanged: (Priority) -> Unit,
+    onDueDateChanged: (Instant?) -> Unit,
     onUndo: () -> Unit,
     onRedo: () -> Unit
 ) {
@@ -57,26 +60,37 @@ fun TaskContent(
             .imePadding()
     ) {
         AnimatedVisibility(visible = !isContentFullScreen){
-            Column {
-                Row {
-                    TextField(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        label = { Text(text = stringResource(R.string.title)) },
-                        value = state.title,
-                        onValueChange = onTitleChanged
+            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = stringResource(R.string.title)) },
+                    value = state.title,
+                    onValueChange = onTitleChanged
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    DueDatePicker(
+                        dueDate = state.dueDate,
+                        onDueDateChanged = onDueDateChanged
                     )
                     PriorityDropDown(
-                        modifier = Modifier.padding(horizontal = 15.dp),
                         priority = state.priority,
                         onPriorityChanged = onPriorityChanged
                     )
                 }
                 StatusGroupButtons(
-                    status = state.status, onStatusChanged = onStatusChanged
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp),
+                    status = state.status,
+                    onStatusChanged = onStatusChanged
                 )
-                Spacer(modifier = Modifier.padding(vertical = 5.dp))
+                Spacer(modifier = Modifier) // additional space at the bottom from Column Arrangement.spacedBy
             }
         }
         ContentTextField(
@@ -128,7 +142,8 @@ fun ContentTextField(
 
     Box {
         ScrollableTextField(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .onFocusChanged { isContentFocused = it.isFocused },
             label = { Text(text = stringResource(R.string.task_content)) },
             value = contentValue,
@@ -157,6 +172,7 @@ fun TaskContentPreview() {
             onContentChanged = {},
             onStatusChanged = {},
             onPriorityChanged = {},
+            onDueDateChanged = {},
             onUndo = {},
             onRedo = {}
         )

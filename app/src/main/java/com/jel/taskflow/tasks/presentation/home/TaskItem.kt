@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.ColorScheme
@@ -40,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.core.theme.TaskFlowTheme
+import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
@@ -48,6 +50,8 @@ import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
 import com.jel.taskflow.tasks.presentation.extensions.imageVector
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 val ColorScheme.collapsedColor: Color
     @Composable
@@ -115,7 +119,8 @@ fun TaskItem(
                 ) {
                     TopIndicationChips(
                         status = task.status,
-                        priority = task.priority
+                        priority = task.priority,
+                        dueDate = task.dueDate
                     )
                     Text(
                         text = task.title,
@@ -167,7 +172,9 @@ fun TaskItem(
 @Composable
 fun TopIndicationChips(
     status: Status,
-    priority: Priority) {
+    priority: Priority,
+    dueDate: Instant?
+    ) {
     Row {
         IndicatorChip(
             label = stringResource(status.labelRes),
@@ -175,12 +182,20 @@ fun TopIndicationChips(
             color = status.color,
             containerColor = status.containerColor
         )
-        Spacer(Modifier.padding(horizontal = 2.dp))
         IndicatorChip(
             label = stringResource(priority.labelRes),
             color = priority.color,
             containerColor = priority.containerColor
         )
+        if (dueDate != null) {
+            Spacer(Modifier.padding(horizontal = 2.dp))
+            IndicatorChip(
+                label = dueDate.toRelativeTime(),
+                imageVector = Icons.Rounded.Event,
+                color = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        }
     }
 }
 
@@ -212,7 +227,7 @@ fun ContentText(content: String) {
 fun TaskItemPreview() {
     TaskFlowTheme {
         TaskItem(
-            task = Task(title = "title", content = "content", priority = Priority.HIGH),
+            task = Task(title = "title", content = "content", priority = Priority.HIGH, dueDate = Clock.System.now()),
             expanded = true,
             onExpandedClicked = {},
             onClick = {},

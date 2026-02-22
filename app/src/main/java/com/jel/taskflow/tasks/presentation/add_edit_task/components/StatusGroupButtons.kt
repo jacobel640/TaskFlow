@@ -2,6 +2,8 @@ package com.jel.taskflow.tasks.presentation.add_edit_task.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,47 +33,49 @@ import com.jel.taskflow.tasks.presentation.extensions.labelRes
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StatusGroupButtons(
-    status: Status, onStatusChanged: (Status) -> Unit
+    modifier: Modifier = Modifier,
+    status: Status,
+    onStatusChanged: (Status) -> Unit
 ) {
-    Text(
-        modifier = Modifier
-            .padding(horizontal = 15.dp)
-            .padding(top = 10.dp),
-        text = stringResource(R.string.status),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.outline,
-    )
-    FlowRow(
-        Modifier
-            .padding(horizontal = 4.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
+    Column(modifier = modifier){
+        Text(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            text = stringResource(R.string.status),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.outline,
+        )
+        FlowRow(
+            Modifier
+                .padding(horizontal = 4.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
 
-        Status.entries.forEachIndexed { index, entry ->
-            val selected = entry == status
+            Status.entries.forEachIndexed { index, entry ->
+                val selected = entry == status
 
-            ToggleButton(
-                modifier = Modifier.semantics { role = Role.RadioButton },
-                checked = selected,
-                onCheckedChange = { onStatusChanged(entry) },
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    Status.entries.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                }
-            ) {
-                AnimatedVisibility(selected) {
-                    Row {
-                        Icon(
-                            imageVector = Icons.Rounded.Check,
-                            contentDescription = "${stringResource(entry.labelRes)} selected."
-                        )
-                        Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                ToggleButton(
+                    modifier = Modifier.semantics { role = Role.RadioButton },
+                    checked = selected,
+                    onCheckedChange = { onStatusChanged(entry) },
+                    shapes = when (index) {
+                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                        Status.entries.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                     }
+                ) {
+                    AnimatedVisibility(selected) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = "${stringResource(entry.labelRes)} selected."
+                            )
+                            Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                        }
+                    }
+                    Text(text = stringResource(entry.labelRes))
                 }
-                Text(text = stringResource(entry.labelRes))
             }
         }
     }

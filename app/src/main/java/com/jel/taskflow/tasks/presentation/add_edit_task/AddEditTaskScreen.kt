@@ -110,6 +110,9 @@ fun AddEditTaskScreen(
                         onPriorityChanged = { newPriority ->
                             viewModel.onPriorityChanged(newPriority)
                         },
+                        onDueDateChanged = { newDate ->
+                            viewModel.onDueDateChanged(newDate)
+                        },
                         onUndo = viewModel::revertChanges,
                         onRedo = { viewModel.revertChanges(true) }
                     )

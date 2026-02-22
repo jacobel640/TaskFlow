@@ -28,12 +28,12 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromInstantToTimestamp(instant: Instant): Long {
-        return instant.toEpochMilliseconds()
+    fun fromInstantToTimestamp(instant: Instant?): Long? {
+        return instant?.toEpochMilliseconds()
     }
 
     @TypeConverter
-    fun fromTimestamp(timestamp: Long): Instant {
-        return Instant.fromEpochMilliseconds(timestamp)
+    fun fromTimestamp(timestamp: Long?): Instant? {
+        return timestamp?.let { Instant.fromEpochMilliseconds(it) }
     }
 }

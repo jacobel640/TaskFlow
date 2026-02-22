@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
@@ -56,6 +57,7 @@ class AddEditTaskViewModel @Inject constructor(
                         ),
                         status = task.status,
                         priority = task.priority,
+                        dueDate = task.dueDate,
                         createdDate = task.createdDate,
                         changedDate = task.changedDate,
                         isLoading = false,
@@ -101,6 +103,12 @@ class AddEditTaskViewModel @Inject constructor(
     fun onPriorityChanged(newPriority: Priority) {
         uiState = uiState.copy(priority = newPriority)
         onCurrentTaskPropertyChanged()
+    }
+
+    fun onDueDateChanged(newDate: Instant?) {
+        uiState = uiState.copy(dueDate = newDate)
+        onCurrentTaskPropertyChanged()
+        updateUiStateHistory()
     }
 
     fun onCurrentTaskPropertyChanged() {
@@ -164,6 +172,7 @@ class AddEditTaskViewModel @Inject constructor(
                     content = uiState.content.text,
                     status = uiState.status,
                     priority = uiState.priority,
+                    dueDate = uiState.dueDate,
                     createdDate = uiState.createdDate,
                     changedDate = uiState.changedDate,
                 )

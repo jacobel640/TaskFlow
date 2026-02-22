@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,13 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jel.taskflow.R
+import com.jel.taskflow.core.utils.Screen
+import com.jel.taskflow.core.utils.toRelativeTime
+import com.jel.taskflow.tasks.presentation.add_edit_task.components.StatusGroupButtons
+import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
 import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
-import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
-import com.jel.taskflow.tasks.presentation.add_edit_task.components.StatusGroupButtons
-import com.jel.taskflow.core.utils.Screen
-import com.jel.taskflow.core.utils.toRelativeTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,7 +131,36 @@ fun SingleTaskScreen(
             }
         }
     ) { innerPadding ->
-        Column(Modifier.padding(innerPadding)) {
+        Column(
+            modifier = Modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            if (uiState.dueDate != null) {
+                Text(
+                    text = "Due Date",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.offset(x = 10.dp, y = 5.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Event,
+                        contentDescription = "Due Date",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = uiState.dueDate.toRelativeTime(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
             StatusGroupButtons(
                 status = uiState.status,
                 onStatusChanged = { newStatus ->
