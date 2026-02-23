@@ -8,7 +8,12 @@ interface TaskRepository {
 
     fun getTasks(): Flow<List<Task>>
 
-    fun getFilteredTasks(settings: TaskSettings, searchQuery: String): Flow<List<Task>>
+    fun getFilteredTasks(
+        settings: TaskSettings,
+        searchQuery: String,
+        requireDueDate: Boolean = false,
+        dueDateStart: Long? = null,
+        dueDateEnd: Long? = null): Flow<List<Task>>
 
     fun getTaskById(id: Long): Flow<Task?>
 

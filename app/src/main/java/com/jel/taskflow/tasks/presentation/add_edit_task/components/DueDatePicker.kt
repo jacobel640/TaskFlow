@@ -18,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.jel.taskflow.core.utils.toRelativeTime
+import com.jel.taskflow.R
+import com.jel.taskflow.core.utils.toRelativeDay
 import kotlin.time.Instant
 
 @Composable
@@ -32,7 +34,7 @@ fun DueDatePicker(
 
     Column(modifier = modifier) {
         Text(
-            text = "Schedule Task (optional)",
+            text = stringResource(R.string.schedule_task_optional),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.offset(x = 10.dp, y = 5.dp)
@@ -41,15 +43,15 @@ fun DueDatePicker(
             label = {
                 Text(
                     text = if (dueDate != null) {
-                        "Scheduled to: ${dueDate.toRelativeTime()}"
+                        stringResource(R.string.scheduled_to, dueDate.toRelativeDay())
                     } else {
-                        "Schedule Task"
+                        stringResource(R.string.schedule_task)
                     },
                     color = MaterialTheme.colorScheme.primary
                 )
             },
             leadingIcon = {
-                Icon(imageVector = Icons.Rounded.DateRange, contentDescription = "Schedule Task")
+                Icon(imageVector = Icons.Rounded.DateRange, contentDescription = stringResource(R.string.schedule_task))
             },
             onClick = { showDatePicker = true }
         )
@@ -69,12 +71,12 @@ fun DueDatePicker(
                         onDueDateChanged(newInstant)
                         showDatePicker = false
                     }) {
-                        Text("Confirm")
+                        Text(stringResource(R.string.confirm))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             ) {

@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.core.theme.TaskFlowTheme
+import com.jel.taskflow.core.utils.toRelativeDay
 import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.enums.Priority
@@ -175,7 +177,10 @@ fun TopIndicationChips(
     priority: Priority,
     dueDate: Instant?
     ) {
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
         IndicatorChip(
             label = stringResource(status.labelRes),
             imageVector = status.imageVector,
@@ -188,9 +193,8 @@ fun TopIndicationChips(
             containerColor = priority.containerColor
         )
         if (dueDate != null) {
-            Spacer(Modifier.padding(horizontal = 2.dp))
             IndicatorChip(
-                label = dueDate.toRelativeTime(),
+                label = dueDate.toRelativeDay(),
                 imageVector = Icons.Rounded.Event,
                 color = MaterialTheme.colorScheme.primary,
                 containerColor = MaterialTheme.colorScheme.primaryContainer

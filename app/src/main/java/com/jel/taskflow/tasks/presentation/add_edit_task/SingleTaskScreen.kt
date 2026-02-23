@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Event
@@ -41,6 +42,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jel.taskflow.R
 import com.jel.taskflow.core.utils.Screen
+import com.jel.taskflow.core.utils.toRelativeDay
 import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.presentation.add_edit_task.components.StatusGroupButtons
 import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
@@ -77,38 +79,36 @@ fun SingleTaskScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            AssistChip(
-                                onClick = {},
-                                colors = AssistChipDefaults.assistChipColors(
-                                    containerColor = uiState.priority.containerColor
-                                ),
-                                label = {
-                                    Text(
-                                        text = stringResource(uiState.priority.labelRes),
-                                        color = uiState.priority.color
-                                    )
-                                },
-                            )
-                            IconButton(
-                                onClick = { showDeleteConfirmDialog = true }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Delete,
-                                    tint = MaterialTheme.colorScheme.error,
-                                    contentDescription = "Delete Task"
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        AssistChip(
+                            onClick = {},
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = uiState.priority.containerColor
+                            ),
+                            label = {
+                                Text(
+                                    text = stringResource(uiState.priority.labelRes),
+                                    color = uiState.priority.color
                                 )
-                            }
-                        }
-                        Text(
-                            text = uiState.title,
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleLarge
+                            },
                         )
+                        IconButton(
+                            onClick = { showDeleteConfirmDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = stringResource(R.string.delete_task)
+                            )
+                        }
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -126,7 +126,7 @@ fun SingleTaskScreen(
                 Icon(
                     imageVector = Icons.Rounded.EditNote,
                     tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = "Edit Task"
+                    contentDescription = stringResource(R.string.edit_task)
                 )
             }
         }
@@ -135,9 +135,15 @@ fun SingleTaskScreen(
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            Text(
+                text = uiState.title,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 5.dp)
+            )
             if (uiState.dueDate != null) {
                 Text(
-                    text = "Due Date",
+                    text = stringResource(R.string.due_date),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.offset(x = 10.dp, y = 5.dp)
@@ -151,11 +157,11 @@ fun SingleTaskScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Event,
-                        contentDescription = "Due Date",
+                        contentDescription = stringResource(R.string.due_date),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = uiState.dueDate.toRelativeTime(),
+                        text = uiState.dueDate.toRelativeDay(),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )

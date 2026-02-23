@@ -22,6 +22,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.Instant as JavaInstant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -54,8 +57,27 @@ class HomeViewModel @Inject constructor(
         _searchQuery,
         totalCountFlow
     ) { (filteredTasks, isLoading), settings, searchQuery, tasksCount ->
+
+        val today = LocalDate.now()
+        val todayTasks = mutableListOf<Task>()
+        val otherTasks = mutableListOf<Task>()
+
+        filteredTasks.forEach { task ->
+            if (task.dueDate != null) {
+                // convert Kotlin Instant to LocalDate from Java
+                val taskDate = JavaInstant.ofEpochMilli(task.dueDate.toEpochMilliseconds())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+
+                if (taskDate == today) {
+                    todayTasks.add(task)
+                } else otherTasks.add(task)
+            } else otherTasks.add(task)
+        }
+
         HomeUiState(
-            tasks = filteredTasks,
+            todayTasks = todayTasks,
+            otherTasks = otherTasks,
             settings = settings,
             searchQuery = searchQuery,
             isLoading = isLoading,

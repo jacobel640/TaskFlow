@@ -9,6 +9,11 @@ class GetFilteredTasks(
     private val repository: TaskRepository
 ) {
 
-    operator fun invoke(settings: TaskSettings, searchQuery: String): Flow<List<Task>> =
-        repository.getFilteredTasks(settings, searchQuery)
+    operator fun invoke(
+        settings: TaskSettings,
+        searchQuery: String,
+        requireDueDate: Boolean = false,
+        dueDateStart: Long? = null,
+        dueDateEnd: Long? = null
+    ): Flow<List<Task>> = repository.getFilteredTasks(settings, searchQuery, requireDueDate, dueDateStart, dueDateEnd)
 }

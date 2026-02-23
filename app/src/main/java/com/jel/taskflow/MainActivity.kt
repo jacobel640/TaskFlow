@@ -16,6 +16,7 @@ import com.jel.taskflow.tasks.presentation.home.HomeScreen
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.TaskScreen
 import com.jel.taskflow.core.theme.TaskFlowTheme
+import com.jel.taskflow.tasks.presentation.calendar.CalendarScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,6 +35,9 @@ class MainActivity : ComponentActivity() {
                 )  {
                     composable(route = Screen.HomeScreen.route) {
                         HomeScreen(navController = navController)
+                    }
+                    composable(route = Screen.CalendarScreen.route) {
+                        CalendarScreen(navController = navController)
                     }
                     composable(
                         route = Screen.SingleTaskScreen.withIdArg(),

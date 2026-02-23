@@ -2,6 +2,7 @@ package com.jel.taskflow.core.utils
 
 sealed class Screen(val route: String) {
     object HomeScreen : Screen(route = "tasks_list_screen")
+    object CalendarScreen : Screen(route = "calendar_screen")
     object SingleTaskScreen : TaskScreen(baseRoute = "single_task_screen")
     object AddEditTaskScreen : TaskScreen(baseRoute = "add_edit_task_screen")
 }

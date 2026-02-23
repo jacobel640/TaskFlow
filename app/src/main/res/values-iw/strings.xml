@@ -34,6 +34,25 @@
     <string name="hiding_completed_tasks">מסתיר משימות שהושלמו</string>
     <string name="no_tasks_greeting">נראה ריק פה…\nבוא נוסיף משימה חדשה!</string>
     <string name="create_new_task">צור משימה חדשה</string>
-    <string name="clear_filters">נקה פילטרים</string>
-    <string name="empty_tasks_filters_results">לא נמצאו משימות תחת הפילטרים האלו…</string>
+    <string name="clear_filters">נקה מסננים</string>
+    <string name="empty_tasks_filters_results">לא נמצאו משימות תחת המסננים האלו…</string>
+    <string name="return_to_top">חזור למעלה</string>
+    <string name="today">היום</string>
+    <string name="other_tasks">משימות אחרות</string>
+    <string name="calendar_day_has_no_scheduled_tasks">אין משימות מתוזמנות ליום זה.</string>
+    <string name="day">יום</string>
+    <string name="week">שבוע</string>
+    <string name="month">חודש</string>
+    <string name="year">שנה</string>
+    <string name="schedule_task_optional">תזמון משימה (אופציונלי)</string>
+    <string name="schedule_task">תזמן משימה</string>
+    <string name="scheduled_to">תוזמנה ל: %1$s</string>
+    <string name="confirm">בחר</string>
+    <string name="cancel">ביטול</string>
+    <string name="delete_task">מחק משימה</string>
+    <string name="due_date">תאריך יעד</string>
+    <string name="day_header_title">%1$d ב%2$s %3$d</string>
+    <string name="week_view_title">שבוע של %1$d ב%2$s</string>
+    <string name="tasks_calendar">יומן משימות</string>
+    <string name="back">Go Back</string>
 </resources>

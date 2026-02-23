@@ -2,6 +2,8 @@ package com.jel.taskflow.tasks.data.repository
 
 import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.jel.taskflow.core.utils.toRelativeDay
+import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.data.TaskDao
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.TaskSettings
@@ -10,13 +12,20 @@ import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Instant
 
 class TaskRepositoryImpl(private val taskDao: TaskDao): TaskRepository {
 
     override fun getTasks(): Flow<List<Task>> =
         taskDao.getTasks().map { tasks -> tasks.sortedBy { it.createdDate } }
 
-    override fun getFilteredTasks(settings: TaskSettings, searchQuery: String): Flow<List<Task>> {
+    override fun getFilteredTasks(
+        settings: TaskSettings,
+        searchQuery: String,
+        requireDueDate: Boolean,
+        dueDateStart: Long?,
+        dueDateEnd: Long?): Flow<List<Task>> {
+
         val args = mutableListOf<Any>()
         val sqlQuery = buildString {
             append("SELECT * FROM tasks WHERE 1=1") // added 'WHERE 1=1' in order to be able to join 'AND' in every case...
@@ -40,6 +49,17 @@ class TaskRepositoryImpl(private val taskDao: TaskDao): TaskRepository {
                 append(" AND status IN ($placeholders)")
                 settings.filterByStatus.forEach { args.add(it.name) }
             }
+
+            if (requireDueDate) {
+                append(" AND dueDate IS NOT NULL")
+
+                if (dueDateStart != null && dueDateEnd != null) {
+                    append(" AND dueDate BETWEEN $dueDateStart AND $dueDateEnd")
+                    Log.d("SQL_DEBUG", "dueDateStart: ${Instant.fromEpochMilliseconds(dueDateStart).toRelativeDay()}")
+                    Log.d("SQL_DEBUG", "dueDateEnd: ${Instant.fromEpochMilliseconds(dueDateEnd).toRelativeDay()}")
+                }
+            }
+
 
             when(settings.sortType) {
                 SortType.TITLE -> append(" ORDER BY title ${settings.sortDirection.name}")

@@ -9,17 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import kotlin.time.Instant
 
-fun Instant.toRelativeTime(): String {
-    val now = System.currentTimeMillis()
-    val time = this.toEpochMilliseconds()
-
-    return DateUtils.getRelativeTimeSpanString(
-        time,
-        now,
+fun Instant.toRelativeTime(): String =
+    DateUtils.getRelativeTimeSpanString(
+        this.toEpochMilliseconds(),
+        System.currentTimeMillis(),
         DateUtils.MINUTE_IN_MILLIS,
         DateUtils.FORMAT_ABBREV_RELATIVE
     ).toString()
-}
+
+fun Instant.toRelativeDay(): String =
+    DateUtils.getRelativeTimeSpanString(
+        this.toEpochMilliseconds(),
+        System.currentTimeMillis(),
+        DateUtils.DAY_IN_MILLIS,
+        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_ABBREV_RELATIVE
+    ).toString()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

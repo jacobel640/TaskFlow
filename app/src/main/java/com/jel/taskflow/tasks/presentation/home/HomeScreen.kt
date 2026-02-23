@@ -23,7 +23,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddTask
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +34,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -121,6 +125,15 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                 title = {
                     Text(text = stringResource(R.string.app_name))
                 },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Screen.CalendarScreen.route) }) {
+                        Icon(
+                            imageVector = Icons.Rounded.CalendarMonth,
+                            contentDescription = stringResource(R.string.tasks_calendar),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.flatColors()
             )
         },
@@ -154,7 +167,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.KeyboardArrowUp,
-                            contentDescription = "Return to top"
+                            contentDescription = stringResource(R.string.return_to_top)
                         )
                     }
                 }
@@ -216,12 +229,14 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     uiState = uiState,
                     onUiAction = viewModel::onUiAction,
                     onNavigateToTaskDetails = { taskId ->
-                        navController.navigate(
-                            route = Screen.SingleTaskScreen.withIdArg(taskId)
-                        )
+                        taskId?.let {
+                            navController.navigate(
+                                route = Screen.SingleTaskScreen.withIdArg(it)
+                            )
+                        }
                     },
-                    deleteTaskClick = { task ->
-                        task.id?.let {
+                    deleteTaskClick = { taskId ->
+                        taskId?.let {
                             viewModel.deleteTask(it)
                         }
                     }
@@ -237,17 +252,20 @@ fun TasksList(
     listState: LazyListState,
     uiState: HomeUiState,
     onUiAction: (HomeUiActions) -> Unit,
-    onNavigateToTaskDetails: (Long) -> Unit,
-    deleteTaskClick: (Task) -> Unit
+    onNavigateToTaskDetails: (Long?) -> Unit,
+    deleteTaskClick: (Long?) -> Unit
 ) {
     var expandedItem by remember { mutableStateOf<Task?>(null) }
+    var todayExpanded by remember { mutableStateOf(true) }
+    var otherExpanded by remember { mutableStateOf(true) }
     val showClearFiltersMessage by remember(
         uiState.settings,
         uiState.searchQuery,
-        uiState.tasks
+        uiState.allTasks
     ) {
-        derivedStateOf { uiState.isFilterApplied() && uiState.tasks.isEmpty() }
+        derivedStateOf { uiState.isFilterApplied() && uiState.allTasks.isEmpty() }
     }
+
     LazyColumn(
         state = listState,
         modifier = modifier
@@ -289,7 +307,7 @@ fun TasksList(
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Clear,
-                                contentDescription = stringResource(R.string.create_new_task)
+                                contentDescription = stringResource(R.string.clear_filters)
                             )
                             Spacer(modifier = Modifier.padding(horizontal = 5.dp))
                             Text(text = stringResource(R.string.clear_filters))
@@ -298,21 +316,90 @@ fun TasksList(
                 }
             }
         }
-        items(
-            items = uiState.tasks,
-            key = { task -> task.id ?: 0L },
-            contentType = { "task_item" }
-        ) { task ->
-            TaskItem(
-                modifier = Modifier.animateItem(),
-                task = task,
-                expanded = (task == expandedItem),
-                onExpandedClicked = {
-                    expandedItem = if (expandedItem == task) null else task
-                },
-                onClick = { task.id?.let { onNavigateToTaskDetails(it) } },
-                onDelete = { deleteTaskClick(task) }
+
+        if (uiState.todayTasks.isNotEmpty()) {
+            stickyHeader(key = "today_header") {
+                SectionHeader(
+                    text = stringResource(R.string.today),
+                    isExpanded = todayExpanded,
+                    onExpandClick = { todayExpanded = !todayExpanded}
+                )
+            }
+            if (todayExpanded) {
+                items(
+                    items = uiState.todayTasks,
+                    key = { task -> "today_${task.id}" },
+                    contentType = { "task_item" }
+                ) { task ->
+                    TaskItem(
+                        modifier = Modifier.animateItem(),
+                        task = task,
+                        expanded = (task == expandedItem),
+                        onExpandedClicked = {
+                            expandedItem = if (expandedItem == task) null else task
+                        },
+                        onClick = { onNavigateToTaskDetails(task.id) },
+                        onDelete = { deleteTaskClick(task.id) }
+                    )
+                }
+            }
+        }
+
+        if (uiState.otherTasks.isNotEmpty()) {
+            if (uiState.todayTasks.isNotEmpty()) {
+                stickyHeader(key = "other_header") {
+                    SectionHeader(
+                        text = stringResource(R.string.other_tasks),
+                        isExpanded = otherExpanded,
+                        onExpandClick = { otherExpanded = !otherExpanded}
+                    )
+                }
+            }
+            if (otherExpanded) {
+                items(
+                    items = uiState.otherTasks,
+                    key = { task -> "other_${task.id}" },
+                    contentType = { "task_item" }
+                ) { task ->
+                    TaskItem(
+                        modifier = Modifier.animateItem(),
+                        task = task,
+                        expanded = (task == expandedItem),
+                        onExpandedClicked = {
+                            expandedItem = if (expandedItem == task) null else task
+                        },
+                        onClick = { onNavigateToTaskDetails(task.id) },
+                        onDelete = { deleteTaskClick(task.id) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SectionHeader(text: String, isExpanded: Boolean, onExpandClick: () -> Unit) {
+    Surface(
+        color = MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp)
             )
+            IconButton(onClick = onExpandClick) {
+                Icon(
+                    imageVector = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    contentDescription = "Toggle expanded"
+                )
+            }
         }
     }
 }
