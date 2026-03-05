@@ -74,7 +74,7 @@ fun AddEditTaskScreen(
                         Icon(
                             imageVector = Icons.Rounded.Restore,
                             tint = MaterialTheme.colorScheme.tertiary,
-                            contentDescription = "restore task changes"
+                            contentDescription = stringResource(R.string.restore_task_changes)
                         )
                     }
                 }

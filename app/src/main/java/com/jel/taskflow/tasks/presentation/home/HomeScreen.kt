@@ -228,12 +228,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     listState = listState,
                     uiState = uiState,
                     onUiAction = viewModel::onUiAction,
-                    onNavigateToTaskDetails = { taskId ->
-                        taskId?.let {
-                            navController.navigate(
-                                route = Screen.SingleTaskScreen.withIdArg(it)
-                            )
-                        }
+                    onNavigateToTaskDetails = { task ->
+                        navController.navigate(
+                            route = Screen.SingleTaskScreen(task)
+                        )
                     },
                     deleteTaskClick = { taskId ->
                         taskId?.let {
@@ -252,7 +250,7 @@ fun TasksList(
     listState: LazyListState,
     uiState: HomeUiState,
     onUiAction: (HomeUiActions) -> Unit,
-    onNavigateToTaskDetails: (Long?) -> Unit,
+    onNavigateToTaskDetails: (Task) -> Unit,
     deleteTaskClick: (Long?) -> Unit
 ) {
     var expandedItem by remember { mutableStateOf<Task?>(null) }
@@ -338,7 +336,7 @@ fun TasksList(
                         onExpandedClicked = {
                             expandedItem = if (expandedItem == task) null else task
                         },
-                        onClick = { onNavigateToTaskDetails(task.id) },
+                        onClick = { onNavigateToTaskDetails(task) },
                         onDelete = { deleteTaskClick(task.id) }
                     )
                 }
@@ -368,7 +366,7 @@ fun TasksList(
                         onExpandedClicked = {
                             expandedItem = if (expandedItem == task) null else task
                         },
-                        onClick = { onNavigateToTaskDetails(task.id) },
+                        onClick = { onNavigateToTaskDetails(task) },
                         onDelete = { deleteTaskClick(task.id) }
                     )
                 }

@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.jel.taskflow.tasks.presentation.add_edit_task.AddEditTaskScreen
-import com.jel.taskflow.tasks.presentation.add_edit_task.SingleTaskScreen
+import com.jel.taskflow.tasks.presentation.single_task.SingleTaskScreen
 import com.jel.taskflow.tasks.presentation.home.HomeScreen
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.TaskScreen
@@ -39,14 +39,8 @@ class MainActivity : ComponentActivity() {
                     composable(route = Screen.CalendarScreen.route) {
                         CalendarScreen(navController = navController)
                     }
-                    composable(
-                        route = Screen.SingleTaskScreen.withIdArg(),
-                        arguments = listOf(
-                            navArgument(name = TaskScreen.TASK_ID_ARG) {
-                                type = NavType.LongType
-                            }
-                        )
-                    ) {
+                    composable<Screen.SingleTaskScreen> {
+                        // the SavedStateHandle in the SingleTaskViewModel is injecting the serializable task from
                         SingleTaskScreen(navController = navController)
                     }
                     composable(

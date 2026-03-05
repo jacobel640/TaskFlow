@@ -1,4 +1,4 @@
-package com.jel.taskflow.tasks.presentation.add_edit_task
+package com.jel.taskflow.tasks.presentation.single_task
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.jel.taskflow.R
 import com.jel.taskflow.core.utils.Screen
@@ -53,24 +54,22 @@ import com.jel.taskflow.tasks.presentation.extensions.labelRes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleTaskScreen(
-    viewModel: AddEditTaskViewModel = hiltViewModel(),
+    viewModel: SingleTaskViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val uiState = viewModel.uiState
+    val currentTask by viewModel.currentTask.collectAsStateWithLifecycle()
     var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showDeleteConfirmDialog) {
         DeleteConfirmDialog(
-            taskTitle = uiState.title,
+            taskTitle = currentTask.title,
             onDismiss = { showDeleteConfirmDialog = false },
             onDeleteConfirm = {
-                viewModel.currentTaskId.let { currentTaskId ->
                     showDeleteConfirmDialog = false
                     navController.previousBackStackEntry
                         ?.savedStateHandle
-                        ?.set("deletedTaskId", currentTaskId)
+                        ?.set("deletedTaskId", viewModel.taskId)
                     navController.popBackStack()
-                }
             }
         )
     }
@@ -86,12 +85,12 @@ fun SingleTaskScreen(
                         AssistChip(
                             onClick = {},
                             colors = AssistChipDefaults.assistChipColors(
-                                containerColor = uiState.priority.containerColor
+                                containerColor = currentTask.priority.containerColor
                             ),
                             label = {
                                 Text(
-                                    text = stringResource(uiState.priority.labelRes),
-                                    color = uiState.priority.color
+                                    text = stringResource(currentTask.priority.labelRes),
+                                    color = currentTask.priority.color
                                 )
                             },
                         )
@@ -118,7 +117,7 @@ fun SingleTaskScreen(
                 modifier = Modifier.padding(bottom = 10.dp),
                 onClick = {
                     navController.navigate(
-                        Screen.AddEditTaskScreen.withIdArg(viewModel.currentTaskId)
+                        Screen.AddEditTaskScreen.withIdArg(viewModel.taskId)
                     )
                 },
 
@@ -136,12 +135,12 @@ fun SingleTaskScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = uiState.title,
+                text = currentTask.title,
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 5.dp)
             )
-            if (uiState.dueDate != null) {
+            currentTask.dueDate?.let { dueDate ->
                 Text(
                     text = stringResource(R.string.due_date),
                     style = MaterialTheme.typography.labelMedium,
@@ -161,18 +160,15 @@ fun SingleTaskScreen(
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = uiState.dueDate.toRelativeDay(),
+                        text = dueDate.toRelativeDay(),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             StatusGroupButtons(
-                status = uiState.status,
-                onStatusChanged = { newStatus ->
-                    viewModel.onStatusChanged(newStatus)
-                    viewModel.saveTask()
-                }
+                status = currentTask.status,
+                onStatusChanged = viewModel::onStatusChanged
             )
 
             SelectionContainer {
@@ -190,7 +186,7 @@ fun SingleTaskScreen(
                                 .padding(horizontal = 5.dp)
                                 .padding(top = 25.dp)
                                 .verticalScroll(rememberScrollState()),
-                            text = uiState.content.text,
+                            text = currentTask.content,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -213,7 +209,7 @@ fun SingleTaskScreen(
                         Text(
                             text = stringResource(
                                 R.string.created_at,
-                                uiState.createdDate.toRelativeTime()
+                                currentTask.createdDate.toRelativeTime()
                             ),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.outline,
@@ -222,7 +218,7 @@ fun SingleTaskScreen(
                         Text(
                             text = stringResource(
                                 R.string.updated_at,
-                                uiState.changedDate.toRelativeTime()
+                                currentTask.changedDate.toRelativeTime()
                             ),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.outline,
