@@ -54,5 +54,23 @@
     <string name="day_header_title">%1$d ב%2$s %3$d</string>
     <string name="week_view_title">שבוע של %1$d ב%2$s</string>
     <string name="tasks_calendar">יומן משימות</string>
-    <string name="back">Go Back</string>
+    <string name="back">חזור</string>
+    <string name="notification_saved_message">ההתראה נשמרה ותופעל ב-%1$s:%2$s בימים שנבחרו</string>
+    <string name="set_daily_notification">הגדר התראה יומית</string>
+    <string name="toggle_expanded">שינוי מצב הרחבה</string>
+    <string name="restore_task_changes">שחזר שינויים במשימה</string>
+    <string name="toggle_filters">הצג/הסתר מסננים</string>
+    <string name="clear_text">נקה טקסט</string>
+    <string name="toggle_sort_direction">שינוי כיוון מיון</string>
+    <string name="all">הכל</string>
+    <string name="collapse">צמצם</string>
+    <string name="expand">הרחב</string>
+    <string name="choose_time_and_days">בחר זמן וימים להתראה</string>
+    <string name="which_days_to_notify">באיזה ימים להתריע?</string>
+    <string name="save">שמור</string>
+    <string name="daily_summary_channel_name">סיכום משימות יומי</string>
+    <string name="daily_summary_channel_desc">התראות המזכירות לך את המשימות של היום</string>
+    <string name="one_task_today_msg">יש לך משימה אחת להיום. כדאי להתחיל!</string>
+    <string name="multiple_tasks_today_msg">יש לך %1$d משימות להיום. שיהיה יום פרודוקטיבי!</string>
+    <string name="good_morning_title">בוקר טוב! ☀️</string>
 </resources>

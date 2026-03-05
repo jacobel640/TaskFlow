@@ -130,7 +130,7 @@ fun SearchAndFilterSection(
                     Icon(
                         imageVector = Icons.Rounded.Clear,
                         tint = MaterialTheme.colorScheme.primary,
-                        contentDescription = "Clear Filters"
+                        contentDescription = stringResource(R.string.clear_filters)
                     )
                 }
                 Spacer(Modifier.padding(start = 5.dp))
@@ -155,7 +155,7 @@ fun SearchAndFilterSection(
                     imageVector =
                         if (isExpanded) Icons.Rounded.KeyboardArrowUp
                         else Icons.Rounded.KeyboardArrowDown,
-                    contentDescription = "Toggle Filters",
+                    contentDescription = stringResource(R.string.toggle_filters),
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -197,7 +197,7 @@ fun SearchAndFilterSection(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Clear,
-                                        contentDescription = "Clear Text"
+                                        contentDescription = stringResource(R.string.clear_text)
                                     )
                                 }
                             }
@@ -375,7 +375,7 @@ fun ToggleSortDirections(
                 SortDirection.DESC -> Icons.Rounded.KeyboardArrowDown
             },
         tint = MaterialTheme.colorScheme.primary,
-        contentDescription = "Toggle Sort Direction"
+        contentDescription = stringResource(R.string.toggle_sort_direction)
     )
 }
 
@@ -432,7 +432,7 @@ fun <T> FilterChips(
                     label = when (items[0]) {
                         is Status -> stringResource(R.string.all_statuses)
                         is Priority -> stringResource(R.string.all_priorities)
-                        else -> "All"
+                        else -> stringResource(R.string.all)
                     },
                     onSelect = onClear,
                     isSelected = selectedValues.isEmpty() || items.size == selectedValues.size

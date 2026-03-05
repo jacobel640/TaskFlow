@@ -54,4 +54,22 @@
     <string name="week_view_title">The week of %1$dth %2$s</string>
     <string name="tasks_calendar">Tasks Calendar</string>
     <string name="back">Go Back</string>
+    <string name="notification_saved_message">Notification saved and will be triggered at %1$s:%2$s on selected days</string>
+    <string name="set_daily_notification">Set daily notification</string>
+    <string name="toggle_expanded">Toggle expanded</string>
+    <string name="restore_task_changes">Restore task changes</string>
+    <string name="toggle_filters">Toggle filters</string>
+    <string name="clear_text">Clear text</string>
+    <string name="toggle_sort_direction">Toggle sort direction</string>
+    <string name="all">All</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand">Expand</string>
+    <string name="choose_time_and_days">Choose time and days for notification</string>
+    <string name="which_days_to_notify">Which days to notify?</string>
+    <string name="save">Save</string>
+    <string name="daily_summary_channel_name">Daily task summary</string>
+    <string name="daily_summary_channel_desc">Notifications reminding you of today\'s tasks</string>
+    <string name="one_task_today_msg">You have one task for today. Better get started!</string>
+    <string name="multiple_tasks_today_msg">You have %1$d tasks for today. Have a productive day!</string>
+    <string name="good_morning_title">Good morning! ☀️</string>
 </resources>
