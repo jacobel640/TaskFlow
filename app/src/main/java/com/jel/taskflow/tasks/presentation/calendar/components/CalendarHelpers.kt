@@ -47,12 +47,17 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.Locale
 
+val daysStartingSunday = DayOfWeek.entries.run {
+    listOf(last()) + dropLast(1)
+}
+
 @Composable
 fun MonthTitle(
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     yearMonth: YearMonth
 ) {
+    DayOfWeek.entries
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -81,7 +86,7 @@ fun MonthTitle(
 @Composable
 fun DaysOfWeekHeader() {
     val locale = Locale.getDefault()
-    val days = DayOfWeek.entries.map { day ->
+    val days = daysStartingSunday.map { day ->
         day.getDisplayName(java.time.format.TextStyle.NARROW, locale)
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
