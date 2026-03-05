@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -58,6 +59,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,6 +71,7 @@ import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.flatColors
 import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.presentation.home.components.NotificationTimeDialog
 import com.jel.taskflow.tasks.presentation.home.components.SearchAndFilterSection
 import kotlinx.coroutines.launch
 
@@ -83,6 +86,27 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
         derivedStateOf {
             listState.firstVisibleItemIndex > 0
         }
+    }
+    val resources = LocalResources.current
+
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+
+    if (showTimePickerDialog) {
+        NotificationTimeDialog(
+            onDismiss = { showTimePickerDialog = false },
+            onConfirm = { hour, minute ->
+                coroutineScope.launch {
+                    snackBarHostState.showSnackbar(
+                        message = resources.getString(
+                            R.string.notification_saved_message,
+                            hour,
+                            minute
+                        ),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+        )
     }
 
     val currentBackStackEntry = navController.currentBackStackEntry
@@ -126,6 +150,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     Text(text = stringResource(R.string.app_name))
                 },
                 actions = {
+                    IconButton(onClick = { showTimePickerDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Notifications,
+                            contentDescription = stringResource(R.string.set_daily_notification),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = { navController.navigate(Screen.CalendarScreen.route) }) {
                         Icon(
                             imageVector = Icons.Rounded.CalendarMonth,
@@ -395,7 +426,7 @@ fun SectionHeader(text: String, isExpanded: Boolean, onExpandClick: () -> Unit) 
             IconButton(onClick = onExpandClick) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                    contentDescription = "Toggle expanded"
+                    contentDescription = stringResource(R.string.toggle_expanded)
                 )
             }
         }
