@@ -284,6 +284,7 @@ fun TasksList(
     uiState: HomeUiState,
     onUiAction: (HomeUiActions) -> Unit,
     onNavigateToTaskDetails: (Long?) -> Unit,
+    onNavigateToTaskEdit: (Long?) -> Unit,
     deleteTaskClick: (Long?) -> Unit
 ) {
     var expandedItem by remember { mutableStateOf<Task?>(null) }
@@ -370,6 +371,7 @@ fun TasksList(
                             expandedItem = if (expandedItem == task) null else task
                         },
                         onClick = { onNavigateToTaskDetails(task.id) },
+                        onEditClick = { onNavigateToTaskEdit(task.id) },
                         onDelete = { deleteTaskClick(task.id) }
                     )
                 }
@@ -400,6 +402,7 @@ fun TasksList(
                             expandedItem = if (expandedItem == task) null else task
                         },
                         onClick = { onNavigateToTaskDetails(task.id) },
+                        onEditClick = { onNavigateToTaskEdit(task.id) },
                         onDelete = { deleteTaskClick(task.id) }
                     )
                 }
