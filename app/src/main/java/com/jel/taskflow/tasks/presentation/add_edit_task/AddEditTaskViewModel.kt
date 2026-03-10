@@ -1,18 +1,23 @@
 package com.jel.taskflow.tasks.presentation.add_edit_task
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.core.utils.TaskScreen
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
-import com.jel.taskflow.tasks.domain.repository.TaskRepository
+import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Clock
@@ -20,126 +25,153 @@ import kotlin.time.Instant
 
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
-    private val repository: TaskRepository,
+    private val useCases: TaskUseCases,
     savedStateHandle: SavedStateHandle // this responsible for injecting taskId and other arguments passing by the nav controller
 ) : ViewModel() {
-
-    var uiState by mutableStateOf(AddEditTaskUiState())
-        private set
 
     private val uiStatesHistory = mutableListOf<AddEditTaskUiState>()
     private var uiStateHistoryPosition = -1
 
-    var currentTaskId: Long? = null
+    private var typingJob: Job? = null
+    private val MAX_HISTORY_SIZE = 50
 
-    init {
-        savedStateHandle.get<Long>("taskId")
-            ?.takeIf { it != -1L }
-            ?.let { taskId ->
-                currentTaskId = taskId
-                observeTask(taskId)
-            } ?: run {
-                uiState = uiState.copy(isLoading = false)
-                uiStatesHistory.add(++uiStateHistoryPosition, uiState)
-            }
-    }
+    val currentTaskId: Long? = savedStateHandle.get<Long>(TaskScreen.TASK_ID_ARG)
+        ?.takeIf { it != -1L }
+    private val _uiState = MutableStateFlow(AddEditTaskUiState())
 
-    private fun observeTask(taskId: Long) {
-        println("LOG observeTask uiStateHistoryPosition: $uiStateHistoryPosition")
-        viewModelScope.launch {
-            repository.getTaskById(taskId).collect { task ->
-                task?.let {
-                    uiState = uiState.copy(
-                        title = task.title,
-                        content = TextFieldValue(
-                            text = task.content,
-                            selection = TextRange(task.content.length)
-                        ),
-                        status = task.status,
-                        priority = task.priority,
-                        dueDate = task.dueDate,
-                        createdDate = task.createdDate,
-                        changedDate = task.changedDate,
-                        isLoading = false,
-                        currentTaskChanged = false,
-                        canUndo = canRevertBackwards(),
-                        canRedo = canRevertForwards()
-                    )
-                    if (uiStatesHistory.isEmpty()) {
-                        uiStatesHistory.add(++uiStateHistoryPosition, uiState)
+    val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
+
+    init { initTaskUiState() }
+
+    private fun initTaskUiState() {
+        if (currentTaskId != null) {
+            viewModelScope.launch {
+                useCases.getTask(currentTaskId).filterNotNull().first().let { task ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            title = TextFieldValue(
+                                text = task.title,
+                                selection = TextRange(task.title.length)
+                            ),
+                            content = TextFieldValue(
+                                text = task.content,
+                                selection = TextRange(task.content.length)
+                            ),
+                            status = task.status,
+                            priority = task.priority,
+                            dueDate = task.dueDate,
+                            createdDate = task.createdDate,
+                            changedDate = task.changedDate,
+                            isLoading = false,
+                            currentTaskChanged = false,
+                            canUndo = canRevertBackwards(),
+                            canRedo = canRevertForwards()
+                        )
                     }
-                } ?: run {
-                    // TODO handle non existing taskId case
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        canUndo = canRevertBackwards(),
-                        canRedo = canRevertForwards()
-                    )
+                    uiStatesHistory.add(++uiStateHistoryPosition, _uiState.value)
                 }
             }
+        } else {
+            _uiState.update { it.copy(isLoading = false) }
+            uiStatesHistory.add(++uiStateHistoryPosition, _uiState.value)
         }
     }
 
-    fun onTitleChanged(newTitle: String) {
-        uiState = uiState.copy(title = newTitle)
-        onCurrentTaskPropertyChanged()
-        updateUiStateHistory()
+    fun onTitleChanged(newTitle: TextFieldValue) {
+        val currentTitleText = _uiState.value.title.text
+        if (currentTitleText != newTitle.text) {
+            onCurrentTaskPropertyChanged(title = newTitle)
+            updateUiStateHistory()
+        }
     }
 
     fun onContentChanged(newContent: TextFieldValue) {
-        val currentContentText = uiState.content.text
-        uiState = uiState.copy(content = newContent)
+        val currentContentText = _uiState.value.content.text
         if (currentContentText != newContent.text) {
-            onCurrentTaskPropertyChanged()
+            onCurrentTaskPropertyChanged(content = newContent)
             updateUiStateHistory()
         }
     }
 
     fun onStatusChanged(newStatus: Status) {
-        uiState = uiState.copy(status = newStatus)
-        onCurrentTaskPropertyChanged()
+        onCurrentTaskPropertyChanged(
+            status = newStatus,
+            currentTaskChanged = true
+        )
     }
 
     fun onPriorityChanged(newPriority: Priority) {
-        uiState = uiState.copy(priority = newPriority)
-        onCurrentTaskPropertyChanged()
+        onCurrentTaskPropertyChanged(
+            priority = newPriority,
+            currentTaskChanged = true
+        )
     }
 
     fun onDueDateChanged(newDate: Instant?) {
-        uiState = uiState.copy(dueDate = newDate)
-        onCurrentTaskPropertyChanged()
-        updateUiStateHistory()
+        onCurrentTaskPropertyChanged(
+            dueDate = newDate,
+            currentTaskChanged = true
+        )
     }
 
-    fun onCurrentTaskPropertyChanged() {
-        uiState = uiState.copy(
-            changedDate = Clock.System.now(),
-            currentTaskChanged = uiStatesHistory.isNotEmpty()
-        )
+    fun onCurrentTaskPropertyChanged(
+        title: TextFieldValue = _uiState.value.title,
+        content: TextFieldValue = _uiState.value.content,
+        status: Status = _uiState.value.status,
+        priority: Priority = _uiState.value.priority,
+        dueDate: Instant? = _uiState.value.dueDate,
+        currentTaskChanged: Boolean = uiState.value.currentTaskChanged
+    ) {
+        _uiState.update { state ->
+            state.copy(
+                title = title,
+                content = content,
+                status = status,
+                priority = priority,
+                dueDate = dueDate,
+                changedDate = Clock.System.now(),
+                currentTaskChanged = currentTaskChanged || uiStateHistoryPosition > 0
+            )
+        }
     }
 
     fun updateUiStateHistory() {
-        uiStatesHistory.add(++uiStateHistoryPosition, uiState)
-        println("LOG updateUiStateHistory uiStateHistoryPosition: $uiStateHistoryPosition")
-        uiState = uiState.copy(
-            canUndo = canRevertBackwards(),
-            canRedo = canRevertForwards()
-        )
+
+        typingJob?.cancel()
+        typingJob = viewModelScope.launch {
+            delay(500)
+
+            uiStatesHistory.add(++uiStateHistoryPosition, _uiState.value)
+
+            if (uiStatesHistory.size > MAX_HISTORY_SIZE) {
+                uiStatesHistory.removeAt(0)
+                uiStateHistoryPosition--
+            }
+
+            _uiState.update { state ->
+                state.copy(
+                    canUndo = canRevertBackwards(),
+                    canRedo = canRevertForwards()
+                )
+            }
+        }
     }
 
     fun canRevertBackwards(): Boolean = uiStateHistoryPosition > 0
     fun canRevertForwards(): Boolean = uiStateHistoryPosition < uiStatesHistory.size - 1
 
     fun revertChanges(forwards: Boolean = false) {
-        uiState = if (forwards) getUiTextStateAt(++uiStateHistoryPosition)
-        else getUiTextStateAt(--uiStateHistoryPosition)
+        _uiState.update {
+            if (forwards) getUiTextStateAt(++uiStateHistoryPosition)
+            else getUiTextStateAt(--uiStateHistoryPosition)
+        }
         println("LOG revertChanges uiStateHistoryPosition: $uiStateHistoryPosition, forwards: $forwards")
     }
 
     fun getUiTextStateAt(index: Int): AddEditTaskUiState =
         uiStatesHistory[index].copy(
-            status = uiState.status,
-            priority = uiState.priority,
+            status = _uiState.value.status,
+            priority = _uiState.value.priority,
             canUndo = canRevertBackwards(),
             canRedo = canRevertForwards()
         )
@@ -147,36 +179,17 @@ class AddEditTaskViewModel @Inject constructor(
     fun reverseChanges() {
         uiStatesHistory.clear()
         uiStateHistoryPosition = -1
-        currentTaskId?.let {
-            observeTask(it)
-        } ?: run {
-            uiState = AddEditTaskUiState(
-                isLoading = false,
-                canUndo = canRevertBackwards(),
-                canRedo = canRevertForwards()
-            )
-        }
+        initTaskUiState()
     }
 
     fun shouldSaveTask(): Boolean =
-        (uiState.currentTaskChanged || currentTaskId == null) &&
-                (uiState.title.isNotBlank() || uiState.content.text.isNotBlank())
+        (_uiState.value.currentTaskChanged || currentTaskId == null) &&
+                (_uiState.value.title.text.isNotBlank() || _uiState.value.content.text.isNotBlank())
 
     fun saveTask() {
         viewModelScope.launch {
-            uiState = uiState.copy(currentTaskChanged = false)
-            repository.insertTask(
-                Task(
-                    id = currentTaskId,
-                    title = uiState.title,
-                    content = uiState.content.text,
-                    status = uiState.status,
-                    priority = uiState.priority,
-                    dueDate = uiState.dueDate,
-                    createdDate = uiState.createdDate,
-                    changedDate = uiState.changedDate,
-                )
-            )
+            _uiState.update { state -> state.copy(currentTaskChanged = false) }
+            useCases.insertTask(_uiState.value.toTask(currentTaskId))
         }
     }
 }

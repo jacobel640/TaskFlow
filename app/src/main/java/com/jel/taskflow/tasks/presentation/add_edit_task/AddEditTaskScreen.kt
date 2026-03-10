@@ -24,12 +24,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.presentation.add_edit_task.components.TaskContent
 import com.jel.taskflow.core.theme.TaskFlowTheme
@@ -41,7 +43,7 @@ fun AddEditTaskScreen(
     viewModel: AddEditTaskViewModel = hiltViewModel()
 ) {
 
-    val state = viewModel.uiState
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
     DisposableEffect(Unit) {
