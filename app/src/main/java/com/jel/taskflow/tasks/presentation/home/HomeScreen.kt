@@ -93,6 +93,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 
     if (showTimePickerDialog) {
         NotificationTimeDialog(
+            homeViewModel = viewModel,
             onDismiss = { showTimePickerDialog = false },
             onConfirm = { hour, minute ->
                 coroutineScope.launch {

@@ -73,4 +73,9 @@
     <string name="one_task_today_msg">יש לך משימה אחת להיום. כדאי להתחיל!</string>
     <string name="multiple_tasks_today_msg">יש לך %1$d משימות להיום. שיהיה יום פרודוקטיבי!</string>
     <string name="good_morning_title">בוקר טוב! ☀️</string>
+    <string name="exact_alarm_permission_title">דרושה הרשאה לתזמון מדויק</string>
+    <string name="exact_alarm_permission_desc">כדי שההתראה תעבוד בדיוק בשעה שבחרת (ולא תעוכב על ידי
+        חיסכון הסוללה), אנא הפעל את ההרשאה במסך ההגדרות שייפתח כעת.
+    </string>
+    <string name="go_to_settings">העבר אותי להגדרות</string>
 </resources>

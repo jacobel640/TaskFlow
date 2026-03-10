@@ -12,6 +12,7 @@ import androidx.work.WorkerParameters
 import com.jel.taskflow.MainActivity
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.domain.model.TaskSettings
+import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -24,15 +25,16 @@ import java.time.ZoneId
 class DailyTaskWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
+    private val preferencesRepository: UserPreferencesRepository,
     private val taskUseCases: TaskUseCases
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         val today = LocalDate.now()
 
-        val allowedDays = NotificationPreferences.getSelectedDays(context)
+        val selectedDays = preferencesRepository.notificationSettingsFlow.first().days
 
-        if (!allowedDays.contains(today.dayOfWeek)) {
+        if (!selectedDays.contains(today.dayOfWeek)) {
             return Result.success()
         }
 

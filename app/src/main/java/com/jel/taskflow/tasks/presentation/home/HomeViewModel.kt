@@ -2,6 +2,7 @@ package com.jel.taskflow.tasks.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jel.taskflow.tasks.domain.model.NotificationSettings
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import javax.inject.Inject
 import java.time.LocalDate
 import java.time.ZoneId
@@ -142,6 +144,19 @@ class HomeViewModel @Inject constructor(
                 taskUseCases.insertTask(task = it)
                 deletedTask = null
             }
+        }
+    }
+
+    val notificationSettings = userPreferencesRepository.notificationSettingsFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = NotificationSettings()
+        )
+
+    fun updateNotificationSettings(hour: Int, minute: Int, days: Set<DayOfWeek>) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateNotificationSettings(hour, minute, days)
         }
     }
 }
