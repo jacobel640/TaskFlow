@@ -79,18 +79,14 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun onTitleChanged(newTitle: TextFieldValue) {
         val currentTitleText = _uiState.value.title.text
-        if (currentTitleText != newTitle.text) {
-            onCurrentTaskPropertyChanged(title = newTitle)
-            updateUiStateHistory()
-        }
+        onCurrentTaskPropertyChanged(title = newTitle)
+        if (currentTitleText != newTitle.text) updateUiStateHistory()
     }
 
     fun onContentChanged(newContent: TextFieldValue) {
         val currentContentText = _uiState.value.content.text
-        if (currentContentText != newContent.text) {
-            onCurrentTaskPropertyChanged(content = newContent)
-            updateUiStateHistory()
-        }
+        onCurrentTaskPropertyChanged(content = newContent)
+        if (currentContentText != newContent.text) updateUiStateHistory()
     }
 
     fun onStatusChanged(newStatus: Status) {
