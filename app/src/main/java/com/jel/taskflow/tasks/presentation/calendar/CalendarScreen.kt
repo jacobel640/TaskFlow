@@ -185,6 +185,11 @@ fun TasksListForDate(tasks: List<Task>, navController: NavController) {
                             navController.navigate(Screen.SingleTaskScreen.withIdArg(it))
                         }
                     },
+                    onEditClick = {
+                        task.id?.let {
+                            navController.navigate(Screen.AddEditTaskScreen.withIdArg(it))
+                        }
+                    },
                     onDelete = {
                         // TODO
                     }

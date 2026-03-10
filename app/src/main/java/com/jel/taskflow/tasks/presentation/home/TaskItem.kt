@@ -5,7 +5,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,10 +12,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
@@ -43,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.toRelativeDay
-import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
@@ -66,6 +64,7 @@ fun TaskItem(
     expanded: Boolean = false,
     onExpandedClicked: () -> Unit,
     onClick: () -> Unit,
+    onEditClick: () -> Unit,
     onDelete: () -> Unit,
     itemShape: CornerBasedShape = MaterialTheme.shapes.medium
 ) {
@@ -124,6 +123,7 @@ fun TaskItem(
                         priority = task.priority,
                         dueDate = task.dueDate
                     )
+                    Spacer(Modifier.padding(vertical = 5.dp))
                     Text(
                         text = task.title,
                         style = MaterialTheme.typography.titleMedium
@@ -148,16 +148,22 @@ fun TaskItem(
             }
             if (expanded) {
                 Column {
-                    ContentText(content = task.content)
-                    Row(Modifier.fillMaxWidth()) {
-                        IconButton(
-                            modifier = Modifier
-                                .clip(shape = MaterialTheme.shapes.large)
-                                .background(color = MaterialTheme.colorScheme.primaryContainer)
-                                .size(30.dp),
-                            onClick = { showDeleteConfirmDialog = true },
-                            shape = MaterialTheme.shapes.large,
-                        ) {
+                    if (task.content.isNotBlank()) {
+                        ContentText(content = task.content)
+                    }
+                    Spacer(Modifier.padding(vertical = 8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        IconButton(onClick = onEditClick) {
+                            Icon(
+                                imageVector = Icons.Rounded.EditNote,
+                                contentDescription = "Edit Task"
+                            )
+                        }
+                        IconButton(onClick = { showDeleteConfirmDialog = true }) {
                             Icon(
                                 imageVector = Icons.Rounded.Delete,
                                 tint = MaterialTheme.colorScheme.error,
@@ -207,7 +213,7 @@ fun TopIndicationChips(
 fun ContentText(content: String) {
     Column {
         Surface(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = 16.dp),
             shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
         ) {
@@ -222,7 +228,6 @@ fun ContentText(content: String) {
                 softWrap = true
             )
         }
-        Spacer(Modifier.padding(vertical = 5.dp))
     }
 }
 
@@ -235,6 +240,7 @@ fun TaskItemPreview() {
             expanded = true,
             onExpandedClicked = {},
             onClick = {},
+            onEditClick = {},
             onDelete = {})
     }
 }
@@ -248,6 +254,7 @@ fun TaskItemNotExpendedPreview() {
             expanded = false,
             onExpandedClicked = {},
             onClick = {},
+            onEditClick = {},
             onDelete = {}
         )
     }
