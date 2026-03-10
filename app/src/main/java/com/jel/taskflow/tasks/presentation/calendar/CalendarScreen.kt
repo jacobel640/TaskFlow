@@ -84,7 +84,9 @@ fun CalendarScreen(
             )
 
             Surface(
-                modifier = Modifier.fillMaxWidth().zIndex(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .zIndex(1f),
                 tonalElevation = 2.dp,
                 shadowElevation = 4.dp
             ) {
