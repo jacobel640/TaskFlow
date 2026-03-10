@@ -25,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -37,6 +39,7 @@ import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.add_edit_task.AddEditTaskUiState
+import com.jel.taskflow.tasks.presentation.add_edit_task.FocusedTextField
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -45,6 +48,8 @@ fun TaskContent(
     state: AddEditTaskUiState,
     onTitleChanged: (TextFieldValue) -> Unit,
     onContentChanged: (TextFieldValue) -> Unit,
+    onFocusChanged: (FocusedTextField, Boolean) -> Unit,
+    onFocusConsumed: () -> Unit,
     onStatusChanged: (Status) -> Unit,
     onPriorityChanged: (Priority) -> Unit,
     onDueDateChanged: (Instant?) -> Unit,
@@ -52,6 +57,21 @@ fun TaskContent(
     onRedo: () -> Unit
 ) {
     var isContentFullScreen by remember { mutableStateOf(false) }
+    val titleFocusRequester = remember { FocusRequester() }
+    val contentFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(key1 = state.fieldToFocus) {
+        state.fieldToFocus?.let { field ->
+            try {
+                when (field) {
+                    FocusedTextField.TITLE -> titleFocusRequester.requestFocus()
+                    FocusedTextField.CONTENT -> contentFocusRequester.requestFocus()
+                }
+            } catch (_: Exception) { } finally {
+                onFocusConsumed()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -62,7 +82,15 @@ fun TaskContent(
         AnimatedVisibility(visible = !isContentFullScreen){
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 TextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(titleFocusRequester)
+                        .onFocusChanged { focusState ->
+                            onFocusChanged(
+                                FocusedTextField.TITLE,
+                                focusState.isFocused
+                            )
+                        },
                     label = { Text(text = stringResource(R.string.title)) },
                     value = state.title,
                     onValueChange = onTitleChanged
@@ -96,6 +124,8 @@ fun TaskContent(
         ContentTextField(
             contentValue = state.content,
             onContentChanged = onContentChanged,
+            focusRequester = contentFocusRequester,
+            onFocusChanged = onFocusChanged,
             canUndo = state.canUndo,
             canRedo = state.canRedo,
             onUndo = onUndo,
@@ -125,6 +155,8 @@ fun TaskContent(
 fun ContentTextField(
     contentValue: TextFieldValue,
     onContentChanged: (TextFieldValue) -> Unit,
+    focusRequester: FocusRequester,
+    onFocusChanged: (FocusedTextField, Boolean) -> Unit,
     canUndo: Boolean,
     canRedo: Boolean,
     onUndo: () -> Unit,
@@ -144,7 +176,14 @@ fun ContentTextField(
         ScrollableTextField(
             modifier = Modifier
                 .fillMaxSize()
-                .onFocusChanged { isContentFocused = it.isFocused },
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    isContentFocused = focusState.isFocused
+                    onFocusChanged(
+                        FocusedTextField.CONTENT,
+                        isContentFocused
+                    )
+                },
             label = { Text(text = stringResource(R.string.task_content)) },
             value = contentValue,
             onValueChange = onContentChanged,
@@ -170,6 +209,8 @@ fun TaskContentPreview() {
             state = AddEditTaskUiState(),
             onTitleChanged = {},
             onContentChanged = {},
+            onFocusChanged = { _, _ -> },
+            onFocusConsumed = {},
             onStatusChanged = {},
             onPriorityChanged = {},
             onDueDateChanged = {},

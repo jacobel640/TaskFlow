@@ -106,6 +106,8 @@ fun AddEditTaskScreen(
                         onContentChanged = { newContent ->
                             viewModel.onContentChanged(newContent)
                         },
+                        onFocusChanged = viewModel::onTextFieldFocusChanged,
+                        onFocusConsumed = viewModel::onFocusConsumed,
                         onStatusChanged = { newStatus ->
                             viewModel.onStatusChanged(newStatus)
                         },

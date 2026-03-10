@@ -23,22 +23,24 @@ import javax.inject.Inject
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+enum class FocusedTextField { TITLE, CONTENT }
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
     private val useCases: TaskUseCases,
     savedStateHandle: SavedStateHandle // this responsible for injecting taskId and other arguments passing by the nav controller
 ) : ViewModel() {
 
-    private val uiStatesHistory = mutableListOf<AddEditTaskUiState>()
-    private var uiStateHistoryPosition = -1
-
+    private val titleStatesHistory = mutableListOf<TextFieldValue>()
+    private var titleHistoryPosition = -1
+    private val contentStatesHistory = mutableListOf<TextFieldValue>()
+    private var contentHistoryPosition = -1
+    private var lastFocusedField = FocusedTextField.CONTENT
     private var typingJob: Job? = null
     private val MAX_HISTORY_SIZE = 50
 
     val currentTaskId: Long? = savedStateHandle.get<Long>(TaskScreen.TASK_ID_ARG)
         ?.takeIf { it != -1L }
     private val _uiState = MutableStateFlow(AddEditTaskUiState())
-
     val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
 
     init { initTaskUiState() }
@@ -64,29 +66,36 @@ class AddEditTaskViewModel @Inject constructor(
                             changedDate = task.changedDate,
                             isLoading = false,
                             currentTaskChanged = false,
-                            canUndo = canRevertBackwards(),
-                            canRedo = canRevertForwards()
+                            canUndo = false,
+                            canRedo = false
                         )
                     }
-                    uiStatesHistory.add(++uiStateHistoryPosition, _uiState.value)
+                    initTextFieldStatesHistory()
                 }
             }
         } else {
             _uiState.update { it.copy(isLoading = false) }
-            uiStatesHistory.add(++uiStateHistoryPosition, _uiState.value)
+            initTextFieldStatesHistory()
         }
+    }
+
+    private fun initTextFieldStatesHistory() {
+        titleStatesHistory.add(++titleHistoryPosition, _uiState.value.title)
+        contentStatesHistory.add(++contentHistoryPosition, _uiState.value.content)
     }
 
     fun onTitleChanged(newTitle: TextFieldValue) {
         val currentTitleText = _uiState.value.title.text
         onCurrentTaskPropertyChanged(title = newTitle)
-        if (currentTitleText != newTitle.text) updateUiStateHistory()
+        if (currentTitleText != newTitle.text)
+            updateUiStateHistory(FocusedTextField.TITLE)
     }
 
     fun onContentChanged(newContent: TextFieldValue) {
         val currentContentText = _uiState.value.content.text
         onCurrentTaskPropertyChanged(content = newContent)
-        if (currentContentText != newContent.text) updateUiStateHistory()
+        if (currentContentText != newContent.text)
+            updateUiStateHistory(FocusedTextField.CONTENT)
     }
 
     fun onStatusChanged(newStatus: Status) {
@@ -126,55 +135,91 @@ class AddEditTaskViewModel @Inject constructor(
                 priority = priority,
                 dueDate = dueDate,
                 changedDate = Clock.System.now(),
-                currentTaskChanged = currentTaskChanged || uiStateHistoryPosition > 0
+                currentTaskChanged = currentTaskChanged ||
+                        (titleHistoryPosition > 0 || contentHistoryPosition > 0)
             )
         }
     }
 
-    fun updateUiStateHistory() {
-
+    fun updateUiStateHistory(field: FocusedTextField) {
         typingJob?.cancel()
         typingJob = viewModelScope.launch {
             delay(500)
 
-            uiStatesHistory.add(++uiStateHistoryPosition, _uiState.value)
+            when(field) {
+                FocusedTextField.TITLE -> {
+                    titleStatesHistory.add(++titleHistoryPosition, _uiState.value.title)
 
-            if (uiStatesHistory.size > MAX_HISTORY_SIZE) {
-                uiStatesHistory.removeAt(0)
-                uiStateHistoryPosition--
-            }
+                    if (titleStatesHistory.size > MAX_HISTORY_SIZE) {
+                        titleStatesHistory.removeAt(0)
+                        titleHistoryPosition--
+                    }
+                }
+                FocusedTextField.CONTENT -> {
+                    contentStatesHistory.add(++contentHistoryPosition, _uiState.value.content)
 
-            _uiState.update { state ->
-                state.copy(
-                    canUndo = canRevertBackwards(),
-                    canRedo = canRevertForwards()
-                )
+                    if (contentStatesHistory.size > MAX_HISTORY_SIZE) {
+                        contentStatesHistory.removeAt(0)
+                        contentHistoryPosition--
+                    }
+                }
             }
+            updateUndoRedoButtonsState()
         }
     }
 
-    fun canRevertBackwards(): Boolean = uiStateHistoryPosition > 0
-    fun canRevertForwards(): Boolean = uiStateHistoryPosition < uiStatesHistory.size - 1
+    fun onTextFieldFocusChanged(focusedTextField: FocusedTextField, isFocused: Boolean = true) {
+        if (isFocused) {
+            lastFocusedField = focusedTextField
+            updateUndoRedoButtonsState()
+        }
+    }
 
+    fun onFocusConsumed() {
+        _uiState.update { state -> state.copy(fieldToFocus = null) }
+    }
+
+    fun updateUndoRedoButtonsState() {
+        val canUndo = when (lastFocusedField) {
+            FocusedTextField.TITLE -> titleHistoryPosition > 0
+            FocusedTextField.CONTENT -> contentHistoryPosition > 0
+        }
+
+        val canRedo = when (lastFocusedField) {
+            FocusedTextField.TITLE -> titleHistoryPosition < titleStatesHistory.size - 1
+            FocusedTextField.CONTENT -> contentHistoryPosition < contentStatesHistory.size - 1
+        }
+
+        _uiState.update { state ->
+            state.copy(
+                canUndo = canUndo,
+                canRedo = canRedo,
+                fieldToFocus = lastFocusedField
+            )
+        }
+    }
     fun revertChanges(forwards: Boolean = false) {
-        _uiState.update {
-            if (forwards) getUiTextStateAt(++uiStateHistoryPosition)
-            else getUiTextStateAt(--uiStateHistoryPosition)
+        when (lastFocusedField) {
+            FocusedTextField.TITLE -> {
+                if (forwards && _uiState.value.canRedo) titleHistoryPosition++
+                else if (_uiState.value.canUndo) titleHistoryPosition--
+                onCurrentTaskPropertyChanged(title = titleStatesHistory[titleHistoryPosition])
+            }
+            FocusedTextField.CONTENT -> {
+                if (forwards && _uiState.value.canRedo) contentHistoryPosition++
+                else if (_uiState.value.canUndo) contentHistoryPosition--
+                onCurrentTaskPropertyChanged(content = contentStatesHistory[contentHistoryPosition])
+            }
         }
-        println("LOG revertChanges uiStateHistoryPosition: $uiStateHistoryPosition, forwards: $forwards")
-    }
 
-    fun getUiTextStateAt(index: Int): AddEditTaskUiState =
-        uiStatesHistory[index].copy(
-            status = _uiState.value.status,
-            priority = _uiState.value.priority,
-            canUndo = canRevertBackwards(),
-            canRedo = canRevertForwards()
-        )
+        updateUndoRedoButtonsState()
+    }
 
     fun reverseChanges() {
-        uiStatesHistory.clear()
-        uiStateHistoryPosition = -1
+        titleStatesHistory.clear()
+        contentStatesHistory.clear()
+        titleHistoryPosition = -1
+        contentHistoryPosition = -1
         initTaskUiState()
     }
 

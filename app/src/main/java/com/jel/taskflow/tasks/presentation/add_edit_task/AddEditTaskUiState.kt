@@ -18,7 +18,8 @@ data class AddEditTaskUiState(
     val isLoading: Boolean = true,
     val currentTaskChanged: Boolean = false,
     val canUndo: Boolean = false,
-    val canRedo: Boolean = false
+    val canRedo: Boolean = false,
+    val fieldToFocus: FocusedTextField? = null
 ) {
     fun toTask(taskId: Long? = null) = Task(
         id = taskId,
