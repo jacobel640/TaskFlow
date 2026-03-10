@@ -43,7 +43,7 @@ import kotlin.time.Instant
 @Composable
 fun TaskContent(
     state: AddEditTaskUiState,
-    onTitleChanged: (String) -> Unit,
+    onTitleChanged: (TextFieldValue) -> Unit,
     onContentChanged: (TextFieldValue) -> Unit,
     onStatusChanged: (Status) -> Unit,
     onPriorityChanged: (Priority) -> Unit,
