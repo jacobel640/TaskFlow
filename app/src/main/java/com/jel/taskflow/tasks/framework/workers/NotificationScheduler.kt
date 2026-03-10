@@ -31,7 +31,7 @@ object NotificationScheduler {
         val now = LocalDateTime.now()
         var targetTime = now.withHour(hour).withMinute(minute).withSecond(0).withNano(0)
 
-        if (targetTime.isBefore(now) || !selectedDays.contains(targetTime.dayOfWeek)) {
+        if (!targetTime.isAfter(now) || !selectedDays.contains(targetTime.dayOfWeek)) {
             do {
                 targetTime = targetTime.plusDays(1)
             } while (!selectedDays.contains(targetTime.dayOfWeek))
@@ -42,6 +42,13 @@ object NotificationScheduler {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetMillis, pendingIntent)
+            } else {
+                alarmManager.setWindow(
+                    AlarmManager.RTC_WAKEUP,
+                    targetMillis,
+                    10 * 60 * 1000L, // 10 minutes window
+                    pendingIntent
+                )
             }
         } else {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetMillis, pendingIntent)

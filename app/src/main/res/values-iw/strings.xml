@@ -72,7 +72,10 @@
     <string name="daily_summary_channel_desc">התראות המזכירות לך את המשימות של היום</string>
     <string name="one_task_today_msg">יש לך משימה אחת להיום. כדאי להתחיל!</string>
     <string name="multiple_tasks_today_msg">יש לך %1$d משימות להיום. שיהיה יום פרודוקטיבי!</string>
-    <string name="good_morning_title">בוקר טוב! ☀️</string>
+    <string name="good_morning_title">בוקר טוב 🌅</string>
+    <string name="good_afternoon_title">צהריים טובים ☀️</string>
+    <string name="good_evening_title">ערב טוב 🌆</string>
+    <string name="good_night_title">לילה טוב 🌙</string>
     <string name="exact_alarm_permission_title">דרושה הרשאה לתזמון מדויק</string>
     <string name="exact_alarm_permission_desc">כדי שההתראה תעבוד בדיוק בשעה שבחרת (ולא תעוכב על ידי
         חיסכון הסוללה), אנא הפעל את ההרשאה במסך ההגדרות שייפתח כעת.
