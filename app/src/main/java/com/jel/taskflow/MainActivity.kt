@@ -39,8 +39,14 @@ class MainActivity : ComponentActivity() {
                     composable(route = Screen.CalendarScreen.route) {
                         CalendarScreen(navController = navController)
                     }
-                    composable<Screen.SingleTaskScreen> {
-                        // the SavedStateHandle in the SingleTaskViewModel is injecting the serializable task from
+                    composable(
+                        route = Screen.SingleTaskScreen.withIdArg(),
+                        arguments = listOf(
+                            navArgument(name = TaskScreen.TASK_ID_ARG) {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) {
                         SingleTaskScreen(navController = navController)
                     }
                     composable(
