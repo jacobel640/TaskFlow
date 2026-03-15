@@ -1,8 +1,10 @@
 package com.jel.taskflow.tasks.presentation.add_edit_task.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.DatePicker
@@ -51,7 +53,21 @@ fun DueDatePicker(
                 )
             },
             leadingIcon = {
-                Icon(imageVector = Icons.Rounded.DateRange, contentDescription = stringResource(R.string.schedule_task))
+                Icon(
+                    imageVector = Icons.Rounded.DateRange,
+                    contentDescription = stringResource(R.string.schedule_task)
+                )
+            },
+            trailingIcon = {
+                dueDate?.let {
+                    Icon(
+                        modifier = Modifier.clickable(
+                            onClick = { onDueDateChanged(null) }
+                        ),
+                        imageVector = Icons.Rounded.Clear,
+                        contentDescription = "Clear due date"
+                    )
+                }
             },
             onClick = { showDatePicker = true }
         )
