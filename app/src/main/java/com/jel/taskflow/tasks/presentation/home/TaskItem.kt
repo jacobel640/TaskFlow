@@ -2,16 +2,25 @@ package com.jel.taskflow.tasks.presentation.home
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
@@ -26,18 +35,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.core.theme.TaskFlowTheme
@@ -50,6 +71,8 @@ import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
 import com.jel.taskflow.tasks.presentation.extensions.imageVector
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -65,6 +88,7 @@ fun TaskItem(
     onExpandedClicked: () -> Unit,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
+    onComplete: () -> Unit,
     onDelete: () -> Unit,
     itemShape: CornerBasedShape = MaterialTheme.shapes.medium
 ) {
@@ -90,25 +114,29 @@ fun TaskItem(
         )
     }
 
-    Surface(
-        modifier = modifier
-            .clip(shape = itemShape)
-            .clickable(
-                onClick = onClick
-            )
-            .animateContentSize(
-                spring(
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            ),
-        color = animatedColor,
-        shape = itemShape,
-        tonalElevation = elevation,
-        shadowElevation = elevation
+    SwipeToToggleCompleteTaskWrapper(
+        modifier = modifier,
+        status = task.status,
+        onComplete = onComplete
     ) {
         Column(
             modifier = Modifier
+                .shadow(
+                    elevation = elevation,
+                    shape = itemShape,
+                    clip = false
+                )
+                .clip(shape = itemShape)
+                .background(color = animatedColor)
+                .clickable(
+                    onClick = onClick
+                )
+                .animateContentSize(
+                    spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
@@ -231,6 +259,152 @@ fun ContentText(content: String) {
     }
 }
 
+@Composable
+fun SwipeToToggleCompleteTaskWrapper(
+    modifier: Modifier = Modifier,
+    status: Status,
+    onComplete: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val currentOnComplete by rememberUpdatedState(onComplete)
+
+    val haptic = LocalHapticFeedback.current
+
+    val maxSwipeDp = 80.dp // reveal the target status icon box
+    val maxSwipePx = with(LocalDensity.current) { maxSwipeDp.toPx() }
+    val triggerThresholdPx = maxSwipePx * 0.9f // vibrate when crossing the 90% swipe bounds
+
+    val offsetX = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
+    var hasTriggeredHaptic by remember { mutableStateOf(false) }
+
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val isThresholdCrossed = offsetX.value >= triggerThresholdPx
+
+    LaunchedEffect(isThresholdCrossed) { // trigger vibration
+        if (isThresholdCrossed && !hasTriggeredHaptic) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            hasTriggeredHaptic = true
+        } else if (!isThresholdCrossed) {
+            hasTriggeredHaptic = false
+        }
+    }
+
+    Box(
+        modifier = modifier.pointerInput(Unit) {
+            detectHorizontalDragGestures(
+                onDragEnd = { // detect position when leaving the finger
+                    coroutineScope.launch {
+                        // if crossed the swipe bounds (90%) toggle the status
+                        if (offsetX.value >= triggerThresholdPx) currentOnComplete()
+                        // finally reset the item position (animated...)
+                        offsetX.animateTo(
+                            0f,
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                        )
+                    }
+                },
+                onDragCancel = {
+                    coroutineScope.launch {
+                        offsetX.animateTo(
+                            0f,
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                        )
+                    }
+                },
+                // calculate the drag position (with limitations...)
+                onHorizontalDrag = { change, dragAmount ->
+                    change.consume()
+                    coroutineScope.launch {
+                        val directionMultiplier = if (isRtl) 1f else -1f
+                        val dragAmountStartToEnd = dragAmount * directionMultiplier
+                        // coerceIn(0f, maxSwipePx) - limits the dragging with the revealing box width
+                        val newOffset = (offsetX.value + dragAmountStartToEnd).coerceIn(0f, maxSwipePx)
+                        offsetX.snapTo(newOffset)
+                    }
+                }
+            )
+        }
+    ) {
+        SwipeToCompleteBackground(
+            modifier = Modifier.matchParentSize(),
+            status = status,
+            offsetX = offsetX.value,
+            maxSwipePx = maxSwipePx,
+            isThresholdCrossed = isThresholdCrossed
+        )
+
+        // the draggable content (TaskItem)
+        val xOffset = if (isRtl) -offsetX.value else offsetX.value
+        Box(
+            modifier = Modifier.offset {
+                IntOffset(xOffset.roundToInt(), 0)
+            }
+        ) { content() }
+    }
+}
+
+@Composable
+fun SwipeToCompleteBackground(
+    modifier: Modifier = Modifier,
+    status: Status,
+    offsetX: Float,
+    maxSwipePx: Float,
+    isThresholdCrossed: Boolean
+) {
+    val targetStatus = if (status == Status.COMPLETED) Status.TODO else Status.COMPLETED
+
+    val backgroundColor by animateColorAsState(
+        targetValue =
+            if (isThresholdCrossed) targetStatus.containerColor
+            else status.containerColor,
+        label = "swipeBackgroundColor",
+        animationSpec = tween(150)
+    )
+
+    // calculate drag progress (animates the icon size)
+    val progress = (offsetX / maxSwipePx).coerceIn(0f, 1f)
+
+    val targetScale = when {
+        isThresholdCrossed -> 1f
+        else -> 0.5f + (progress * 0.5f)
+    }
+
+    val iconScale by animateFloatAsState(
+        targetValue = targetScale,
+        animationSpec = spring(
+            dampingRatio = if (isThresholdCrossed) Spring.DampingRatioMediumBouncy else Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "swipeIconScale"
+    )
+
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .padding(start = 5.dp)
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .width(with(LocalDensity.current) { offsetX.toDp() - 5.dp }) // expanding with the drag
+                .background(
+                    color = backgroundColor,
+                    shape = MaterialTheme.shapes.medium
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (progress > 0.1f) {
+                Icon(
+                    imageVector = targetStatus.imageVector,
+                    tint = targetStatus.color,
+                    contentDescription = "Toggle Complete Task",
+                    modifier = Modifier.scale(iconScale)
+                )
+            }
+        }
+    }
+}
+
 @Preview(name = "expended = true")
 @Composable
 fun TaskItemPreview() {
@@ -241,6 +415,7 @@ fun TaskItemPreview() {
             onExpandedClicked = {},
             onClick = {},
             onEditClick = {},
+            onComplete = {},
             onDelete = {})
     }
 }
@@ -255,6 +430,7 @@ fun TaskItemNotExpendedPreview() {
             onExpandedClicked = {},
             onClick = {},
             onEditClick = {},
+            onComplete = {},
             onDelete = {}
         )
     }

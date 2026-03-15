@@ -1,11 +1,16 @@
 package com.jel.taskflow.tasks.presentation.home
 
+import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.SortDirection
 import com.jel.taskflow.tasks.domain.model.enums.SortType
 import com.jel.taskflow.tasks.domain.model.enums.Status
 
 sealed class HomeUiActions {
+    data class OnDeleteTask(val taskId: Long) : HomeUiActions()
+    data object OnUndoDeleteTask : HomeUiActions()
+    data class OnToggleCompleteTask(val task: Task) : HomeUiActions()
+    data object OnUndoToggleCompleteTask : HomeUiActions()
     data class OnSearchQueryChange(val query: String) : HomeUiActions()
     data class OnSortTypeChange(val sortType: SortType) : HomeUiActions()
     data class OnSortDirectionChange(val direction: SortDirection) : HomeUiActions()

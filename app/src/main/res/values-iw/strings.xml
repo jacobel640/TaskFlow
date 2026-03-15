@@ -49,7 +49,9 @@
     <string name="scheduled_to">תוזמנה ל: %1$s</string>
     <string name="confirm">בחר</string>
     <string name="cancel">ביטול</string>
+    <string name="toggle_completed_snackbar_message">משימה סומנה כ\'%1$s\'</string>
     <string name="delete_task">מחק משימה</string>
+    <string name="delete_task_failed_message">לא נמצאה משימה עם מזהה: %1$d</string>
     <string name="due_date">תאריך יעד</string>
     <string name="day_header_title">%1$d ב%2$s %3$d</string>
     <string name="week_view_title">שבוע של %1$d ב%2$s</string>

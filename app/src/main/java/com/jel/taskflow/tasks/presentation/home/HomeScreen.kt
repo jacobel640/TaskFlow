@@ -71,8 +71,10 @@ import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.flatColors
 import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.presentation.extensions.labelRes
 import com.jel.taskflow.tasks.presentation.home.components.NotificationTimeDialog
 import com.jel.taskflow.tasks.presentation.home.components.SearchAndFilterSection
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -114,7 +116,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     LaunchedEffect(currentBackStackEntry) {
         val savedStateHandle = currentBackStackEntry?.savedStateHandle
         savedStateHandle?.get<Long>("deletedTaskId")?.let { taskId ->
-            viewModel.deleteTask(taskId)
+            viewModel.onUiAction(HomeUiActions.OnDeleteTask(taskId = taskId))
             savedStateHandle.remove<Long>("deletedTaskId")
         }
     }
@@ -122,7 +124,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     val deleteSuccessMessage = stringResource(R.string.task_deleted_successfully_message)
     val undoActionText = stringResource(R.string.undo_action)
     LaunchedEffect(key1 = viewModel.uiEvent) {
-        viewModel.uiEvent.collect { event ->
+        // collect latest to force collecting the latest value (and dismiss the
+        // previous snackBar) before the completion of the previous coroutine (currently
+        // showing snackBar - launched by the previous uiEvent value)
+        viewModel.uiEvent.collectLatest { event ->
+            snackBarHostState.currentSnackbarData?.dismiss()
             when (event) {
                 is HomeUiEvent.ShowUndoDeleteSnackbar -> {
                     val result = snackBarHostState.showSnackbar(
@@ -131,12 +137,29 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.restoreDeletedTask()
+                        viewModel.onUiAction(HomeUiActions.OnUndoDeleteTask)
                     }
                 }
 
                 is HomeUiEvent.ShowDeleteFailedSnackbar -> {
-                    snackBarHostState.showSnackbar(event.message)
+                    snackBarHostState.showSnackbar(
+                        resources.getString(
+                            R.string.delete_task_failed_message, event.taskId
+                        )
+                    )
+                }
+                is HomeUiEvent.ShowTaskCompletedSnackbar -> {
+                    val result = snackBarHostState.showSnackbar(
+                        message = resources.getString(
+                            R.string.toggle_completed_snackbar_message,
+                            resources.getString(event.toggledStatus.labelRes)
+                        ),
+                        actionLabel = undoActionText,
+                        duration = SnackbarDuration.Short
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.onUiAction(HomeUiActions.OnUndoToggleCompleteTask)
+                    }
                 }
             }
         }
@@ -273,11 +296,6 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                                 route = Screen.AddEditTaskScreen.withIdArg(it)
                             )
                         }
-                    },
-                    deleteTaskClick = { taskId ->
-                        taskId?.let {
-                            viewModel.deleteTask(it)
-                        }
                     }
                 )
             }
@@ -292,8 +310,7 @@ fun TasksList(
     uiState: HomeUiState,
     onUiAction: (HomeUiActions) -> Unit,
     onNavigateToTaskDetails: (Long?) -> Unit,
-    onNavigateToTaskEdit: (Long?) -> Unit,
-    deleteTaskClick: (Long?) -> Unit
+    onNavigateToTaskEdit: (Long?) -> Unit
 ) {
     var expandedItem by remember { mutableStateOf<Task?>(null) }
     var todayExpanded by remember { mutableStateOf(true) }
@@ -380,7 +397,12 @@ fun TasksList(
                         },
                         onClick = { onNavigateToTaskDetails(task.id) },
                         onEditClick = { onNavigateToTaskEdit(task.id) },
-                        onDelete = { deleteTaskClick(task.id) }
+                        onComplete = { onUiAction(HomeUiActions.OnToggleCompleteTask(task = task)) },
+                        onDelete = {
+                            task.id?.let {
+                                onUiAction(HomeUiActions.OnDeleteTask(taskId = it))
+                            }
+                        }
                     )
                 }
             }
@@ -411,7 +433,12 @@ fun TasksList(
                         },
                         onClick = { onNavigateToTaskDetails(task.id) },
                         onEditClick = { onNavigateToTaskEdit(task.id) },
-                        onDelete = { deleteTaskClick(task.id) }
+                        onComplete = { onUiAction(HomeUiActions.OnToggleCompleteTask(task = task)) },
+                        onDelete = {
+                            task.id?.let {
+                                onUiAction(HomeUiActions.OnDeleteTask(taskId = it))
+                            }
+                        }
                     )
                 }
             }

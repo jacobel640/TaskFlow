@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jel.taskflow.tasks.domain.model.NotificationSettings
 import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,9 +24,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
-import javax.inject.Inject
 import java.time.LocalDate
 import java.time.ZoneId
+import javax.inject.Inject
 import java.time.Instant as JavaInstant
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,7 +35,6 @@ class HomeViewModel @Inject constructor(
     private val taskUseCases: TaskUseCases,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
-
     private val _searchQuery = MutableStateFlow("")
     private val totalCountFlow = taskUseCases.getTasksCount()
 
@@ -52,6 +52,9 @@ class HomeViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000L),
         initialValue = Pair(emptyList(), true)
     )
+
+    private val _uiEvent = Channel<HomeUiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     val uiState: StateFlow<HomeUiState> = combine(
         filteredTasksFlow,
@@ -93,6 +96,10 @@ class HomeViewModel @Inject constructor(
 
     fun onUiAction(uiActions: HomeUiActions) {
         when(uiActions) {
+            is HomeUiActions.OnToggleCompleteTask -> toggleCompleteTask(uiActions.task)
+            is HomeUiActions.OnUndoToggleCompleteTask -> undoToggleCompleteTask()
+            is HomeUiActions.OnDeleteTask -> deleteTask(uiActions.taskId)
+            is HomeUiActions.OnUndoDeleteTask -> restoreDeletedTask()
             is HomeUiActions.OnClearFilters -> viewModelScope.launch {
                 userPreferencesRepository.clearFilters()
                 _searchQuery.value = ""
@@ -121,9 +128,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-    private val _homeUiEvent = Channel<HomeUiEvent>()
-    val uiEvent = _homeUiEvent.receiveAsFlow()
     private var deletedTask: Task? = null
 
     fun deleteTask(taskId: Long) {
@@ -131,9 +135,9 @@ class HomeViewModel @Inject constructor(
             taskUseCases.getTask(taskId).firstOrNull()?.let {
                 deletedTask = it
                 taskUseCases.deleteTask(it)
-                _homeUiEvent.send(HomeUiEvent.ShowUndoDeleteSnackbar)
+                _uiEvent.send(HomeUiEvent.ShowUndoDeleteSnackbar)
             } ?: run {
-                _homeUiEvent.send(HomeUiEvent.ShowDeleteFailedSnackbar("cannot find task with id: $taskId"))
+                _uiEvent.send(HomeUiEvent.ShowDeleteFailedSnackbar(taskId))
             }
         }
     }
@@ -143,6 +147,32 @@ class HomeViewModel @Inject constructor(
             viewModelScope.launch {
                 taskUseCases.insertTask(task = it)
                 deletedTask = null
+            }
+        }
+    }
+
+    private var recentlyCompletedTask: Task? = null
+
+    private fun toggleCompleteTask(task: Task) {
+        viewModelScope.launch {
+            recentlyCompletedTask = task
+            val targetStatus = if (task.status == Status.COMPLETED) Status.TODO else Status.COMPLETED
+            val toggledCompleteTask = task.copy(status = targetStatus)
+            taskUseCases.insertTask(toggledCompleteTask)
+
+            _uiEvent.send(
+                HomeUiEvent.ShowTaskCompletedSnackbar(
+                    toggledStatus = targetStatus
+                )
+            )
+        }
+    }
+
+    private fun undoToggleCompleteTask() {
+        viewModelScope.launch {
+            recentlyCompletedTask?.let { task ->
+                taskUseCases.insertTask(task)
+                recentlyCompletedTask = null
             }
         }
     }

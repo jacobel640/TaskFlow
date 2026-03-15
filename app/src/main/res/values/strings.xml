@@ -81,4 +81,6 @@
         the settings screen that will open now.
     </string>
     <string name="go_to_settings">Go to settings</string>
+    <string name="delete_task_failed_message">cannot find task with id: %1$d</string>
+    <string name="toggle_completed_snackbar_message">Marked as %1$s</string>
 </resources>
