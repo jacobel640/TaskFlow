@@ -36,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -272,14 +273,16 @@ fun SwipeToToggleCompleteTaskWrapper(
 
     val maxSwipeDp = 80.dp // reveal the target status icon box
     val maxSwipePx = with(LocalDensity.current) { maxSwipeDp.toPx() }
-    val triggerThresholdPx = maxSwipePx * 0.9f // vibrate when crossing the 90% swipe bounds
 
     val offsetX = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
     var hasTriggeredHaptic by remember { mutableStateOf(false) }
 
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val isThresholdCrossed = offsetX.value >= triggerThresholdPx
+
+    val isThresholdCrossed by remember { // toggle when crossing the 90% swipe bounds
+        derivedStateOf { offsetX.value >= maxSwipePx * 0.9f }
+    }
 
     LaunchedEffect(isThresholdCrossed) { // trigger vibration
         if (isThresholdCrossed && !hasTriggeredHaptic) {
@@ -296,30 +299,23 @@ fun SwipeToToggleCompleteTaskWrapper(
                 onDragEnd = { // detect position when leaving the finger
                     coroutineScope.launch {
                         // if crossed the swipe bounds (90%) toggle the status
-                        if (offsetX.value >= triggerThresholdPx) currentOnComplete()
+                        if (isThresholdCrossed) currentOnComplete()
                         // finally reset the item position (animated...)
-                        offsetX.animateTo(
-                            0f,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
+                        offsetX.animateTo(0f, animationSpec = spring(stiffness = Spring.StiffnessMediumLow))
                     }
                 },
                 onDragCancel = {
                     coroutineScope.launch {
-                        offsetX.animateTo(
-                            0f,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
+                        offsetX.animateTo(0f, animationSpec = spring(stiffness = Spring.StiffnessMediumLow))
                     }
                 },
                 // calculate the drag position (with limitations...)
                 onHorizontalDrag = { change, dragAmount ->
                     change.consume()
                     coroutineScope.launch {
-                        val directionMultiplier = if (isRtl) 1f else -1f
-                        val dragAmountStartToEnd = dragAmount * directionMultiplier
+                        val startToEndDragAmount = if (isRtl) -dragAmount else dragAmount
                         // coerceIn(0f, maxSwipePx) - limits the dragging with the revealing box width
-                        val newOffset = (offsetX.value + dragAmountStartToEnd).coerceIn(0f, maxSwipePx)
+                        val newOffset = (offsetX.value + startToEndDragAmount).coerceIn(0f, maxSwipePx)
                         offsetX.snapTo(newOffset)
                     }
                 }
@@ -335,11 +331,8 @@ fun SwipeToToggleCompleteTaskWrapper(
         )
 
         // the draggable content (TaskItem)
-        val xOffset = if (isRtl) -offsetX.value else offsetX.value
         Box(
-            modifier = Modifier.offset {
-                IntOffset(xOffset.roundToInt(), 0)
-            }
+            modifier = Modifier.offset { IntOffset(offsetX.value.roundToInt(), 0) }
         ) { content() }
     }
 }
@@ -382,8 +375,8 @@ fun SwipeToCompleteBackground(
     Box(modifier = modifier) {
         Row(
             modifier = Modifier
-                .padding(start = 5.dp)
-                .align(Alignment.CenterEnd)
+                .padding(end = 5.dp)
+                .align(Alignment.CenterStart)
                 .fillMaxHeight()
                 .width(with(LocalDensity.current) { offsetX.toDp() - 5.dp }) // expanding with the drag
                 .background(
