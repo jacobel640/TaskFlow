@@ -18,18 +18,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -43,7 +48,11 @@ import com.jel.taskflow.tasks.presentation.calendar.components.DayHeaderView
 import com.jel.taskflow.tasks.presentation.calendar.components.MonthView
 import com.jel.taskflow.tasks.presentation.calendar.components.WeekView
 import com.jel.taskflow.tasks.presentation.calendar.components.YearView
+import com.jel.taskflow.tasks.presentation.extensions.labelRes
+import com.jel.taskflow.tasks.presentation.home.HomeUiActions
+import com.jel.taskflow.tasks.presentation.home.HomeUiEvent
 import com.jel.taskflow.tasks.presentation.home.TaskItem
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +65,53 @@ fun CalendarScreen(
     val tasksByDate by viewModel.tasksByDate.collectAsStateWithLifecycle()
     val allTasks = remember(tasksByDate) {
         tasksByDate.values.flatten()
+    }
+
+    val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
+
+    val deleteSuccessMessage = stringResource(R.string.task_deleted_successfully_message)
+    val undoActionText = stringResource(R.string.undo_action)
+    LaunchedEffect(key1 = viewModel.uiEvent) {
+        // collect latest to force collecting the latest value (and dismiss the
+        // previous snackBar) before the completion of the previous coroutine (currently
+        // showing snackBar - launched by the previous uiEvent value)
+        viewModel.uiEvent.collectLatest { event ->
+            snackBarHostState.currentSnackbarData?.dismiss()
+            when (event) {
+                is HomeUiEvent.ShowUndoDeleteSnackbar -> {
+                    val result = snackBarHostState.showSnackbar(
+                        message = deleteSuccessMessage,
+                        actionLabel = undoActionText,
+                        duration = SnackbarDuration.Short
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.restoreDeletedTask()
+                    }
+                }
+
+                is HomeUiEvent.ShowDeleteFailedSnackbar -> {
+                    snackBarHostState.showSnackbar(
+                        resources.getString(
+                            R.string.delete_task_failed_message, event.taskId
+                        )
+                    )
+                }
+                is HomeUiEvent.ShowTaskCompletedSnackbar -> {
+                    val result = snackBarHostState.showSnackbar(
+                        message = resources.getString(
+                            R.string.toggle_completed_snackbar_message,
+                            resources.getString(event.toggledStatus.labelRes)
+                        ),
+                        actionLabel = undoActionText,
+                        duration = SnackbarDuration.Short
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.undoToggleCompleteTask()
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -120,7 +176,12 @@ fun CalendarScreen(
                 }
             }
 
-            TasksListForDate(allTasks, navController)
+            TasksListForDate(
+                tasks = allTasks,
+                onToggleCompletedTask = viewModel::toggleCompleteTask,
+                onDeleteTask = viewModel::deleteTask,
+                navController = navController
+            )
         }
     }
 }
@@ -154,7 +215,11 @@ fun ViewModeSelector(currentMode: CalendarViewMode, onModeSelected: (CalendarVie
 }
 
 @Composable
-fun TasksListForDate(tasks: List<Task>, navController: NavController) {
+fun TasksListForDate(
+    tasks: List<Task>,
+    onToggleCompletedTask: (Task) -> Unit,
+    onDeleteTask: (Long) -> Unit,
+    navController: NavController) {
     var expandedItem by remember { mutableStateOf<Task?>(null) }
 
     if (tasks.isEmpty()) {
@@ -192,8 +257,11 @@ fun TasksListForDate(tasks: List<Task>, navController: NavController) {
                             navController.navigate(Screen.AddEditTaskScreen.withIdArg(it))
                         }
                     },
+                    onComplete = {
+                        onToggleCompletedTask(task)
+                    },
                     onDelete = {
-                        // TODO
+                        task.id?.let { onDeleteTask(it) }
                     }
                 )
             }

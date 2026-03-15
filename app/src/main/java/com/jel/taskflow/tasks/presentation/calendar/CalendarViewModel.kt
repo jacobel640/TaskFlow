@@ -4,11 +4,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
+import com.jel.taskflow.tasks.presentation.home.HomeUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -27,6 +31,9 @@ class CalendarViewModel @Inject constructor(
 
     private val _viewMode = MutableStateFlow(CalendarViewMode.MONTH)
     val viewMode = _viewMode.asStateFlow()
+
+    private val _uiEvent = Channel<HomeUiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val tasksByDate: StateFlow<Map<LocalDate, List<Task>>> = combine(
@@ -89,4 +96,54 @@ class CalendarViewModel @Inject constructor(
     fun onViewModeChanged(mode: CalendarViewMode) {
         _viewMode.value = mode
     }
+
+    private var deletedTask: Task? = null
+
+    fun deleteTask(taskId: Long) {
+        viewModelScope.launch {
+            taskUseCases.getTask(taskId).firstOrNull()?.let {
+                deletedTask = it
+                taskUseCases.deleteTask(it)
+                _uiEvent.send(HomeUiEvent.ShowUndoDeleteSnackbar)
+            } ?: run {
+                _uiEvent.send(HomeUiEvent.ShowDeleteFailedSnackbar(taskId))
+            }
+        }
+    }
+
+    fun restoreDeletedTask() {
+        deletedTask?.let {
+            viewModelScope.launch {
+                taskUseCases.insertTask(task = it)
+                deletedTask = null
+            }
+        }
+    }
+
+    private var recentlyCompletedTask: Task? = null
+
+    fun toggleCompleteTask(task: Task) {
+        viewModelScope.launch {
+            recentlyCompletedTask = task
+            val targetStatus = if (task.status == Status.COMPLETED) Status.TODO else Status.COMPLETED
+            val toggledCompleteTask = task.copy(status = targetStatus)
+            taskUseCases.insertTask(toggledCompleteTask)
+
+            _uiEvent.send(
+                HomeUiEvent.ShowTaskCompletedSnackbar(
+                    toggledStatus = targetStatus
+                )
+            )
+        }
+    }
+
+    fun undoToggleCompleteTask() {
+        viewModelScope.launch {
+            recentlyCompletedTask?.let { task ->
+                taskUseCases.insertTask(task)
+                recentlyCompletedTask = null
+            }
+        }
+    }
+
 }
