@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
@@ -49,7 +50,6 @@ import com.jel.taskflow.tasks.presentation.calendar.components.MonthView
 import com.jel.taskflow.tasks.presentation.calendar.components.WeekView
 import com.jel.taskflow.tasks.presentation.calendar.components.YearView
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
-import com.jel.taskflow.tasks.presentation.home.HomeUiActions
 import com.jel.taskflow.tasks.presentation.home.HomeUiEvent
 import com.jel.taskflow.tasks.presentation.home.TaskItem
 import kotlinx.coroutines.flow.collectLatest
@@ -115,6 +115,8 @@ fun CalendarScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.tasks_calendar)) },
