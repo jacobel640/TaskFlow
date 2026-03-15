@@ -9,7 +9,7 @@
     <string name="created_at">נוצר: %1$s</string>
     <string name="updated_at">עודכן: %1$s</string>
     <string name="priority">עדיפות</string>
-    <string name="status_todo">ממתין</string>
+    <string name="status_todo">ממתינה</string>
     <string name="status_pending">בתהליך</string>
     <string name="status_completed">הושלמה</string>
     <string name="priority_low">נמוכה</string>
