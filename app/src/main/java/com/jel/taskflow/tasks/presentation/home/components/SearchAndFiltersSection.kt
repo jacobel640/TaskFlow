@@ -88,7 +88,7 @@ val SortType.labelRes: Int
     }
 
 @Composable
-fun SearchAndFilterSection(
+fun SearchAndFiltersSection(
     uiState: HomeUiState,
     onUiAction: (HomeUiActions) -> Unit
 ) {
@@ -308,7 +308,11 @@ fun SortDropdown(
             MaterialTheme(shapes = MaterialTheme.shapes.copy(extraSmall = dropDownWindowShape)) {
                 val selectionState = rememberDropdownSelectionState(selectedValue, items)
 
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    containerColor = MaterialTheme.colorScheme.background
+                ) {
                     CompositionLocalProvider(LocalRippleConfiguration provides null) {
                         Box(modifier = Modifier.width(IntrinsicSize.Max)) {
                             AnimatedSelector(selectionState, shape = dropDownItemShape)
@@ -476,9 +480,9 @@ fun FilterChip(
 
 @Preview(showBackground = true)
 @Composable
-fun SearchAndFilterSectionPreview() {
+fun SearchAndFiltersSectionPreview() {
     TaskFlowTheme {
-        SearchAndFilterSection(
+        SearchAndFiltersSection(
             uiState = HomeUiState(),
             onUiAction = {}
         )

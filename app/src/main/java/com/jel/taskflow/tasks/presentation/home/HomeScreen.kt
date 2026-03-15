@@ -73,7 +73,7 @@ import com.jel.taskflow.core.utils.flatColors
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
 import com.jel.taskflow.tasks.presentation.home.components.NotificationTimeDialog
-import com.jel.taskflow.tasks.presentation.home.components.SearchAndFilterSection
+import com.jel.taskflow.tasks.presentation.home.components.SearchAndFiltersSection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -333,7 +333,7 @@ fun TasksList(
     ) {
         item(key = "header_section") {
             Column(modifier = Modifier.fillMaxWidth()) {
-                SearchAndFilterSection(
+                SearchAndFiltersSection(
                     uiState = uiState,
                     onUiAction = onUiAction
                 )
