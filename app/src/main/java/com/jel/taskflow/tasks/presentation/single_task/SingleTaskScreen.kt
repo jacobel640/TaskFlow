@@ -80,23 +80,24 @@ fun SingleTaskScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            AssistChip(
-                                onClick = {},
-                                colors = AssistChipDefaults.assistChipColors(
-                                    containerColor = currentTask.priority.containerColor
-                                ),
-                                label = {
-                                    Text(
-                                        text = stringResource(currentTask.priority.labelRes),
-                                        color = currentTask.priority.color
-                                    )
-                                },
-                            )
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            currentTask.priority?.let {
+                                AssistChip(
+                                    modifier = Modifier.align(Alignment.CenterStart),
+                                    onClick = {},
+                                    colors = AssistChipDefaults.assistChipColors(
+                                        containerColor = currentTask.priority.containerColor
+                                    ),
+                                    label = {
+                                        Text(
+                                            text = stringResource(currentTask.priority.labelRes),
+                                            color = currentTask.priority.color
+                                        )
+                                    },
+                                )
+                            }
                             IconButton(
+                                modifier = Modifier.align(Alignment.CenterEnd),
                                 onClick = { showDeleteConfirmDialog = true }
                             ) {
                                 Icon(
