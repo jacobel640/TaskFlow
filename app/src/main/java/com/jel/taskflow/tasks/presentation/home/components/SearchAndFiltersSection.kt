@@ -72,6 +72,7 @@ import com.jel.taskflow.tasks.domain.model.enums.SortDirection
 import com.jel.taskflow.tasks.domain.model.enums.SortType
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
+import com.jel.taskflow.tasks.presentation.extensions.options
 import com.jel.taskflow.tasks.presentation.home.HomeUiActions
 import com.jel.taskflow.tasks.presentation.home.HomeUiState
 import com.jel.taskflow.tasks.presentation.home.collapsedColor
@@ -385,8 +386,8 @@ fun ToggleSortDirections(
 
 @Composable
 fun FilterOptions(
-    selectedPriorities: Set<Priority>,
-    onPrioritySelected: (Priority) -> Unit,
+    selectedPriorities: Set<Priority?>,
+    onPrioritySelected: (Priority?) -> Unit,
     onClearPriorities: () -> Unit,
     selectedStatuses: Set<Status>,
     onStatusSelected: (Status) -> Unit,
@@ -396,10 +397,13 @@ fun FilterOptions(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
+        val options = Priority.options()
+        val optionsRotated = options.drop(1) + options.first()
+
         Spacer(modifier = Modifier.width(5.dp))
         FilterChips(
             labelRes = R.string.priorities,
-            items = Priority.entries,
+            items = optionsRotated,
             selectedValues = selectedPriorities,
             onValueSelected = onPrioritySelected,
             onClear = onClearPriorities
@@ -435,7 +439,7 @@ fun <T> FilterChips(
                 FilterChip(
                     label = when (items[0]) {
                         is Status -> stringResource(R.string.all_statuses)
-                        is Priority -> stringResource(R.string.all_priorities)
+                        is Priority? -> stringResource(R.string.all_priorities)
                         else -> stringResource(R.string.all)
                     },
                     onSelect = onClear,
@@ -446,7 +450,7 @@ fun <T> FilterChips(
                 FilterChip(
                     label = when (it) {
                         is Status -> stringResource(it.labelRes)
-                        is Priority -> stringResource(it.labelRes)
+                        is Priority? -> stringResource(it.labelRes)
                         else -> it.toString()
                     },
                     onSelect = { onValueSelected(it) },

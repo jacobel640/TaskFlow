@@ -14,7 +14,7 @@ sealed class HomeUiActions {
     data class OnSearchQueryChange(val query: String) : HomeUiActions()
     data class OnSortTypeChange(val sortType: SortType) : HomeUiActions()
     data class OnSortDirectionChange(val direction: SortDirection) : HomeUiActions()
-    data class OnTogglePriorityFilters(val priority: Priority) : HomeUiActions()
+    data class OnTogglePriorityFilters(val priority: Priority?) : HomeUiActions()
     data class OnToggleStatusFilters(val status: Status) : HomeUiActions()
     data class OnToggleShowCompletedTasks(val show: Boolean) : HomeUiActions()
     object OnClearStatusFilters : HomeUiActions()

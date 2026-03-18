@@ -16,6 +16,7 @@ import com.jel.taskflow.tasks.domain.model.enums.SortDirection
 import com.jel.taskflow.tasks.domain.model.enums.SortType
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.calendar.components.daysStartingSunday
+import com.jel.taskflow.tasks.presentation.extensions.nullName
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -67,7 +68,10 @@ class UserPreferencesRepository @Inject constructor(@ApplicationContext private 
                 preferences[PreferencesKeys.SORT_DIRECTION] ?: SortDirection.DESC.name
             )
             val filterByPriority = preferences[PreferencesKeys.FILTER_BY_PRIORITY]
-                ?.map { Priority.valueOf(it) }
+                ?.map { priority->
+                    if (priority == Priority.nullName) null
+                    else Priority.valueOf(priority)
+                }
                 ?.toSet() ?: emptySet()
 
             val filterByStatus = preferences[PreferencesKeys.FILTER_BY_STATUS]
@@ -91,13 +95,14 @@ class UserPreferencesRepository @Inject constructor(@ApplicationContext private 
         }
     }
 
-    suspend fun togglePriorityFilter(priority: Priority) {
+    suspend fun togglePriorityFilter(priority: Priority?) {
         context.dataStore.edit { preferences ->
             val currentPriorities = preferences[PreferencesKeys.FILTER_BY_PRIORITY] ?: emptySet()
-            val newPriorities = if (priority.name in currentPriorities) {
-                currentPriorities - priority.name
+            val priorityName = priority?.name ?: Priority.nullName
+            val newPriorities = if (priorityName in currentPriorities) {
+                currentPriorities - priorityName
             } else {
-                currentPriorities + priority.name
+                currentPriorities + priorityName
             }
             preferences[PreferencesKeys.FILTER_BY_PRIORITY] = newPriorities
         }

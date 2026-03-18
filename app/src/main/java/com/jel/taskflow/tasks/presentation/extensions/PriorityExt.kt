@@ -38,5 +38,7 @@ val Priority?.containerColor: Color
             else -> MaterialTheme.colorScheme.background
         }
 
+val Priority.Companion.nullName: String get() = "NULL"
+
 fun Priority.Companion.options(): List<Priority?> =
     listOf<Priority?>(null) + Priority.entries

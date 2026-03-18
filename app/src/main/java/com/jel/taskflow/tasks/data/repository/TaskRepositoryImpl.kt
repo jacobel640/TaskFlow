@@ -3,7 +3,6 @@ package com.jel.taskflow.tasks.data.repository
 import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.jel.taskflow.core.utils.toRelativeDay
-import com.jel.taskflow.core.utils.toRelativeTime
 import com.jel.taskflow.tasks.data.TaskDao
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.TaskSettings
@@ -38,16 +37,19 @@ class TaskRepositoryImpl(private val taskDao: TaskDao): TaskRepository {
                 append(" AND (title LIKE '%$searchQuery%' OR content LIKE '%$searchQuery%')")
             }
 
-            if (settings.filterByPriority.isNotEmpty()) {
-                val placeholders = settings.filterByPriority.joinToString { "?" }
-                append(" AND priority IN ($placeholders)")
-                settings.filterByPriority.forEach { args.add(it.name) }
-            }
-
             if (settings.filterByStatus.isNotEmpty()) {
                 val placeholders = settings.filterByStatus.joinToString { "?" }
                 append(" AND status IN ($placeholders)")
                 settings.filterByStatus.forEach { args.add(it.name) }
+            }
+
+            if (settings.filterByPriority.isNotEmpty()) {
+                val placeholders = settings.filterByPriority.joinToString { "?" }
+                append(" AND priority IN ($placeholders)")
+                settings.filterByPriority.forEach { it?.name?.let { element -> args.add(element) } }
+                if (settings.filterByPriority.any { priority -> priority == null }) {
+                    append(" OR priority IS NULL")
+                }
             }
 
             if (requireDueDate) {
