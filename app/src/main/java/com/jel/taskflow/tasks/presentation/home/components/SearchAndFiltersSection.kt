@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -94,7 +93,6 @@ fun SearchAndFiltersSection(
     onUiAction: (HomeUiActions) -> Unit
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     val filtersApplied by remember(
         uiState.settings.filterByStatus,
@@ -177,32 +175,10 @@ fun SearchAndFiltersSection(
                     modifier = Modifier.padding(10.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
-                        value = uiState.searchQuery,
-                        onValueChange = { onUiAction(HomeUiActions.OnSearchQueryChange(it)) },
-                        label = { Text(stringResource(R.string.task_search)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                                isExpanded = false
-                            }
-                        ),
-                        trailingIcon = {
-                            if (uiState.searchQuery.isNotEmpty()) {
-                                IconButton(
-                                    onClick = { onUiAction(HomeUiActions.OnSearchQueryChange("")) }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Clear,
-                                        contentDescription = stringResource(R.string.clear_text)
-                                    )
-                                }
-                            }
-                        }
+                    SearchField(
+                        searchQuery = uiState.searchQuery,
+                        onValueChanged = { onUiAction(HomeUiActions.OnSearchQueryChange(it)) },
+                        onDoneClicked = { isExpanded = false }
                     )
                     FilterOptions(
                         selectedPriorities = uiState.settings.filterByPriority,
@@ -212,43 +188,83 @@ fun SearchAndFiltersSection(
                         onStatusSelected = { onUiAction(HomeUiActions.OnToggleStatusFilters(it)) },
                         onClearStatuses = { onUiAction(HomeUiActions.OnClearStatusFilters) }
                     )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(
-                                onClick = {
-                                    onUiAction(
-                                        HomeUiActions.OnToggleShowCompletedTasks(
-                                            show = !uiState.settings.showCompletedTasks
-                                        )
-                                    )
-                                }
-                            ),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text =
-                                stringResource(
-                                    id =
-                                        if (uiState.settings.showCompletedTasks) R.string.show_completed_tasks
-                                        else R.string.hiding_completed_tasks
-                                )
-                        )
-                        Switch(
-                            checked = uiState.settings.showCompletedTasks,
-                            onCheckedChange = {
-                                onUiAction(
-                                    HomeUiActions.OnToggleShowCompletedTasks(
-                                        show = !uiState.settings.showCompletedTasks
-                                    )
-                                )
-                            },
-                        )
-                    }
+                    ShowCompletedTasksSwitch(
+                        showCompletedTasks = uiState.settings.showCompletedTasks,
+                        onCheckedChanged = { isChecked ->
+                            onUiAction(
+                                HomeUiActions.OnToggleShowCompletedTasks(show = isChecked)
+                            )
+                        }
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SearchField(
+    searchQuery: String,
+    onValueChanged: (String) -> Unit,
+    onDoneClicked: () -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    OutlinedTextField(
+        value = searchQuery,
+        onValueChange = onValueChanged,
+        label = { Text(stringResource(R.string.task_search)) },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+                onDoneClicked()
+            }
+        ),
+        trailingIcon = {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(
+                    onClick = { onValueChanged("") }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Clear,
+                        contentDescription = stringResource(R.string.clear_text)
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun ShowCompletedTasksSwitch(
+    showCompletedTasks: Boolean,
+    onCheckedChanged: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                onClick = { onCheckedChanged(!showCompletedTasks) }
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text =
+                stringResource(
+                    id =
+                        if (showCompletedTasks) R.string.show_completed_tasks
+                        else R.string.hiding_completed_tasks
+                )
+        )
+        Switch(
+            checked = showCompletedTasks,
+            onCheckedChange = onCheckedChanged,
+        )
     }
 }
 
