@@ -81,6 +81,7 @@ import kotlinx.coroutines.launch
 val SortType.labelRes: Int
     get() = when (this) {
         SortType.TITLE -> R.string.title
+        SortType.DUE_DATE -> R.string.due_date
         SortType.STATUS -> R.string.status
         SortType.PRIORITY -> R.string.priority
         SortType.CREATED -> R.string.date_created

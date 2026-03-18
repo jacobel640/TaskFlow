@@ -65,6 +65,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao): TaskRepository {
 
             when(settings.sortType) {
                 SortType.TITLE -> append(" ORDER BY title ${settings.sortDirection.name}")
+                SortType.DUE_DATE -> append(" ORDER BY dueDate ${settings.sortDirection.name}")
                 SortType.STATUS -> append(" ORDER BY status ${settings.sortDirection.name}")
                 SortType.PRIORITY -> append(" ORDER BY priority ${settings.sortDirection.name}")
                 SortType.CREATED -> append(" ORDER BY createdDate ${settings.sortDirection.name}")
