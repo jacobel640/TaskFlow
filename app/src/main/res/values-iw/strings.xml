@@ -83,4 +83,5 @@
         חיסכון הסוללה), אנא הפעל את ההרשאה במסך ההגדרות שייפתח כעת.
     </string>
     <string name="go_to_settings">העבר אותי להגדרות</string>
+    <string name="priority_none">ללא</string>
 </resources>

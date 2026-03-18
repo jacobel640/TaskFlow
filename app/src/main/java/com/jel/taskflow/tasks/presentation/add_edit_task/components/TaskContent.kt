@@ -51,7 +51,7 @@ fun TaskContent(
     onFocusChanged: (FocusedTextField, Boolean) -> Unit,
     onFocusConsumed: () -> Unit,
     onStatusChanged: (Status) -> Unit,
-    onPriorityChanged: (Priority) -> Unit,
+    onPriorityChanged: (Priority?) -> Unit,
     onDueDateChanged: (Instant?) -> Unit,
     onUndo: () -> Unit,
     onRedo: () -> Unit

@@ -1,3 +1,6 @@
 package com.jel.taskflow.tasks.domain.model.enums
 
-enum class Priority { LOW, MEDIUM, HIGH }
+enum class Priority {
+    LOW, MEDIUM, HIGH;
+    companion object
+}

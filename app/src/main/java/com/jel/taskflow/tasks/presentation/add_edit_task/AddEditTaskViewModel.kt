@@ -105,7 +105,7 @@ class AddEditTaskViewModel @Inject constructor(
         )
     }
 
-    fun onPriorityChanged(newPriority: Priority) {
+    fun onPriorityChanged(newPriority: Priority?) {
         onCurrentTaskPropertyChanged(
             priority = newPriority,
             currentTaskChanged = true
@@ -123,7 +123,7 @@ class AddEditTaskViewModel @Inject constructor(
         title: TextFieldValue = _uiState.value.title,
         content: TextFieldValue = _uiState.value.content,
         status: Status = _uiState.value.status,
-        priority: Priority = _uiState.value.priority,
+        priority: Priority? = _uiState.value.priority,
         dueDate: Instant? = _uiState.value.dueDate,
         currentTaskChanged: Boolean = uiState.value.currentTaskChanged
     ) {

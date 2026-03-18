@@ -11,9 +11,10 @@ import com.jel.taskflow.tasks.domain.model.Task
 
 @Database(
     entities = [Task::class],
-    version = 3,
+    version = 4,
     autoMigrations = [
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4)
     ]
 )
 @TypeConverters(Converters::class)

@@ -209,7 +209,7 @@ fun TaskItem(
 @Composable
 fun TopIndicationChips(
     status: Status,
-    priority: Priority,
+    priority: Priority?,
     dueDate: Instant?
     ) {
     Row(
@@ -222,11 +222,13 @@ fun TopIndicationChips(
             color = status.color,
             containerColor = status.containerColor
         )
-        IndicatorChip(
-            label = stringResource(priority.labelRes),
-            color = priority.color,
-            containerColor = priority.containerColor
-        )
+        priority?.let {
+            IndicatorChip(
+                label = stringResource(priority.labelRes),
+                color = priority.color,
+                containerColor = priority.containerColor
+            )
+        }
         if (dueDate != null) {
             IndicatorChip(
                 label = dueDate.toRelativeDay(),

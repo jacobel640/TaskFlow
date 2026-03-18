@@ -11,7 +11,7 @@ data class AddEditTaskUiState(
     val title: TextFieldValue = TextFieldValue(""),
     val content: TextFieldValue = TextFieldValue(""),
     val status: Status = Status.TODO,
-    val priority: Priority = Priority.MEDIUM,
+    val priority: Priority? = null,
     val dueDate: Instant? = null,
     val createdDate: Instant = Clock.System.now(),
     val changedDate: Instant = createdDate,
