@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ) {
                         // the SavedStateHandle in the AddEditTaskViewModel is injecting the above taskId argument
-                        AddEditTaskScreen()
+                        AddEditTaskScreen(navController = navController)
                     }
                 }
             }

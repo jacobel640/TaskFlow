@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.presentation.add_edit_task.components.TaskContent
 import com.jel.taskflow.core.theme.TaskFlowTheme
@@ -40,7 +43,8 @@ import com.jel.taskflow.core.utils.flatColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTaskScreen(
-    viewModel: AddEditTaskViewModel = hiltViewModel()
+    viewModel: AddEditTaskViewModel = hiltViewModel(),
+    navController: NavController
 ) {
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -60,7 +64,16 @@ fun AddEditTaskScreen(
                 TopAppBar(
                     title = {
                         Text(text = stringResource(R.string.edit_task))
-                    }, colors = TopAppBarDefaults.flatColors()
+                    },
+                    colors = TopAppBarDefaults.flatColors(),
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
+                            )
+                        }
+                    }
                 )
             },
             floatingActionButtonPosition = FabPosition.End,
