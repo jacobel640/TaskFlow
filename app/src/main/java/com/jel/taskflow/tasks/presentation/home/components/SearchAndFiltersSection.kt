@@ -282,9 +282,7 @@ fun SortOptions(
 fun SortDropdown(
     items: List<SortType>,
     selectedValue: SortType,
-    onValueSelected: (SortType) -> Unit,
-    dropDownWindowShape: CornerBasedShape = MaterialTheme.shapes.medium,
-    dropDownItemShape: CornerBasedShape = MaterialTheme.shapes.large
+    onValueSelected: (SortType) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -306,7 +304,7 @@ fun SortDropdown(
             )
         }
         Box(modifier = Modifier.size(0.dp)) { // workaround to keep the popUp aligned to the end of the button
-            MaterialTheme(shapes = MaterialTheme.shapes.copy(extraSmall = dropDownWindowShape)) {
+            MaterialTheme(shapes = MaterialTheme.shapes.copy(extraSmall = MaterialTheme.shapes.medium)) {
                 val selectionState = rememberDropdownSelectionState(selectedValue, items)
 
                 DropdownMenu(
@@ -316,7 +314,7 @@ fun SortDropdown(
                 ) {
                     CompositionLocalProvider(LocalRippleConfiguration provides null) {
                         Box(modifier = Modifier.width(IntrinsicSize.Max)) {
-                            AnimatedSelector(selectionState, shape = dropDownItemShape)
+                            AnimatedSelector(selectionState)
 
                             Column {
                                 items.forEachIndexed { index, item ->
@@ -329,8 +327,7 @@ fun SortDropdown(
                                                     index,
                                                     it
                                                 )
-                                            }
-                                            .clip(dropDownItemShape),
+                                            },
                                         text = {
                                             Text(
                                                 text = stringResource(item.labelRes),

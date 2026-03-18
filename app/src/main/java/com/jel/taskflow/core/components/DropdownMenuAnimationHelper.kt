@@ -78,7 +78,7 @@ class DropdownSelectionState<T>(
 @Composable
 fun <T> AnimatedSelector(
     state: DropdownSelectionState<T>,
-    shape: Shape = RoundedCornerShape(8.dp),
+    shape: Shape = MaterialTheme.shapes.large,
     color: Color = MaterialTheme.colorScheme.primaryContainer
 ) {
     if (state.isReady) {
