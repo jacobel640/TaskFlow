@@ -58,6 +58,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -120,84 +121,91 @@ fun TaskItem(
         status = task.status,
         onComplete = onComplete
     ) {
-        Column(
+        TaskIndicationLineWrapper(
             modifier = Modifier
                 .shadow(
                     elevation = elevation,
                     shape = itemShape,
                     clip = false
                 )
-                .clip(shape = itemShape)
-                .background(color = animatedColor)
-                .clickable(
-                    onClick = onClick
-                )
-                .animateContentSize(
-                    spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
-                .fillMaxWidth()
-                .padding(16.dp)
+                .clickable(onClick = onClick),
+            width = 3.dp,
+            itemShape = itemShape,
+            indicationColor =
+                if (task.status == Status.COMPLETED) task.status.containerColor
+                else animatedColor
         ) {
-            Row {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(1f)
-                ) {
-                    TopIndicationChips(
-                        status = task.status,
-                        priority = task.priority,
-                        dueDate = task.dueDate
-                    )
-                    Spacer(Modifier.padding(vertical = 5.dp))
-                    Text(
-                        text = task.title,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-                IconButton(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    onClick = onExpandedClicked
-                ) {
-                    if (expanded) {
-                        Icon(
-                            imageVector = Icons.Rounded.KeyboardArrowUp,
-                            contentDescription = "Collapse"
+            Column(
+                modifier = Modifier
+                    .clip(shape = itemShape)
+                    .background(color = animatedColor)
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .animateContentSize(
+                        spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow
                         )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Rounded.KeyboardArrowDown,
-                            contentDescription = "Expand"
-                        )
-                    }
-                }
-            }
-            if (expanded) {
-                Column {
-                    if (task.content.isNotBlank()) {
-                        ContentText(content = task.content)
-                    }
-                    Spacer(Modifier.padding(vertical = 8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    )
+            ) {
+                Row {
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .weight(1f)
                     ) {
-                        IconButton(onClick = onEditClick) {
+                        TopIndicationChips(
+                            status = task.status,
+                            priority = task.priority,
+                            dueDate = task.dueDate
+                        )
+                        Spacer(Modifier.padding(vertical = 5.dp))
+                        Text(
+                            text = task.title,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    IconButton(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        onClick = onExpandedClicked
+                    ) {
+                        if (expanded) {
                             Icon(
-                                imageVector = Icons.Rounded.EditNote,
-                                contentDescription = "Edit Task"
+                                imageVector = Icons.Rounded.KeyboardArrowUp,
+                                contentDescription = "Collapse"
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Rounded.KeyboardArrowDown,
+                                contentDescription = "Expand"
                             )
                         }
-                        IconButton(onClick = { showDeleteConfirmDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Rounded.Delete,
-                                tint = MaterialTheme.colorScheme.error,
-                                contentDescription = "Delete Task"
-                            )
+                    }
+                }
+                if (expanded) {
+                    Column {
+                        if (task.content.isNotBlank()) {
+                            ContentText(content = task.content)
+                        }
+                        Spacer(Modifier.padding(vertical = 8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            IconButton(onClick = onEditClick) {
+                                Icon(
+                                    imageVector = Icons.Rounded.EditNote,
+                                    contentDescription = "Edit Task"
+                                )
+                            }
+                            IconButton(onClick = { showDeleteConfirmDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Delete,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    contentDescription = "Delete Task"
+                                )
+                            }
                         }
                     }
                 }
@@ -237,6 +245,26 @@ fun TopIndicationChips(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             )
         }
+    }
+}
+
+@Composable
+fun TaskIndicationLineWrapper(
+    modifier: Modifier = Modifier,
+    width: Dp,
+    itemShape: CornerBasedShape,
+    indicationColor: Color,
+    content: @Composable () -> Unit
+) {
+    val animatedColor by animateColorAsState(indicationColor)
+
+    Box(
+        modifier = modifier
+            .clip(shape = itemShape)
+            .background(color = animatedColor)
+            .padding(start = width)
+    ) {
+        content()
     }
 }
 
