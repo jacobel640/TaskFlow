@@ -24,7 +24,7 @@ TaskFlow is built to demonstrate modern Android development best practices, feat
 
 ### 🎯 Core Task Management
 * **Create & Edit:** Seamlessly add, update, and categorize tasks.
-* **Quick Swipe Actions:** Easily swipe on any task to instantly toggle its status between **Completed** and **Pending**.
+* **Quick Swipe Actions:** Easily swipe on any task to instantly toggle its status between **Completed** and **TODO**.
 * **Smart Search & Filtering:** Find tasks instantly using the real-time search bar, or filter them by **Status** (Done, Pending) and **Priority** (High, Medium, Low).
 * **Sorting Options:** Keep things organized by sorting tasks by Date or Title.
 * **Undo/Redo:** Built-in history management when editing tasks to prevent accidental data loss.
