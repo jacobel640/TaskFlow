@@ -127,7 +127,7 @@ class CalendarViewModel @Inject constructor(
             recentlyCompletedTask = task
             val targetStatus = if (task.status == Status.COMPLETED) Status.TODO else Status.COMPLETED
             val toggledCompleteTask = task.copy(status = targetStatus)
-            taskUseCases.insertTask(toggledCompleteTask)
+            taskUseCases.updateTask(toggledCompleteTask)
 
             _uiEvent.send(
                 HomeUiEvent.ShowTaskCompletedSnackbar(
@@ -140,7 +140,7 @@ class CalendarViewModel @Inject constructor(
     fun undoToggleCompleteTask() {
         viewModelScope.launch {
             recentlyCompletedTask?.let { task ->
-                taskUseCases.insertTask(task)
+                taskUseCases.updateTask(task)
                 recentlyCompletedTask = null
             }
         }

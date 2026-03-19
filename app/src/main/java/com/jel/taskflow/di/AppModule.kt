@@ -10,6 +10,7 @@ import com.jel.taskflow.tasks.domain.use_case.GetFilteredTasks
 import com.jel.taskflow.tasks.domain.use_case.GetTask
 import com.jel.taskflow.tasks.domain.use_case.GetTasksCount
 import com.jel.taskflow.tasks.domain.use_case.InsertTask
+import com.jel.taskflow.tasks.domain.use_case.UpdateTask
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.Module
 import dagger.Provides
@@ -44,6 +45,7 @@ object AppModule {
             getFilteredTasks = GetFilteredTasks(repository),
             getTask = GetTask(repository),
             insertTask = InsertTask(repository),
+            updateTask = UpdateTask(repository),
             deleteTask = DeleteTask(repository),
             getTasksCount = GetTasksCount(repository)
         )

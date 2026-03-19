@@ -81,7 +81,9 @@ class TaskRepositoryImpl(private val taskDao: TaskDao): TaskRepository {
 
     override fun getTaskById(id: Long): Flow<Task?> = taskDao.getTaskById(id)
 
-    override suspend fun insertTask(task: Task) = taskDao.insertTask(task)
+    override suspend fun insertTask(task: Task): Long = taskDao.insertTask(task)
+
+    override suspend fun updateTask(task: Task) = taskDao.updateTask(task)
 
     override suspend fun deleteTask(task: Task) = taskDao.deleteTask(task)
 

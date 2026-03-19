@@ -39,7 +39,7 @@ class SingleTaskViewModel @Inject constructor(
         if (uiState is SingleTaskUiState.Success) {
             viewModelScope.launch {
                 val taskToUpdate = uiState.task.copy(status = newStatus)
-                useCases.insertTask(taskToUpdate)
+                useCases.updateTask(taskToUpdate)
             }
         }
     }

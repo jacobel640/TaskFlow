@@ -38,7 +38,7 @@ class AddEditTaskViewModel @Inject constructor(
     private var typingJob: Job? = null
     private val MAX_HISTORY_SIZE = 50
 
-    val currentTaskId: Long? = savedStateHandle.get<Long>(TaskScreen.TASK_ID_ARG)
+    var currentTaskId: Long? = savedStateHandle.get<Long>(TaskScreen.TASK_ID_ARG)
         ?.takeIf { it != -1L }
     private val _uiState = MutableStateFlow(AddEditTaskUiState())
     val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
@@ -46,9 +46,9 @@ class AddEditTaskViewModel @Inject constructor(
     init { initTaskUiState() }
 
     private fun initTaskUiState() {
-        if (currentTaskId != null) {
+        currentTaskId?.let {
             viewModelScope.launch {
-                useCases.getTask(currentTaskId).filterNotNull().first().let { task ->
+                useCases.getTask(it).filterNotNull().first().let { task ->
                     _uiState.update { currentState ->
                         currentState.copy(
                             title = TextFieldValue(
@@ -73,7 +73,7 @@ class AddEditTaskViewModel @Inject constructor(
                     initTextFieldStatesHistory()
                 }
             }
-        } else {
+        } ?: run {
             _uiState.update { it.copy(isLoading = false) }
             initTextFieldStatesHistory()
         }
@@ -230,7 +230,7 @@ class AddEditTaskViewModel @Inject constructor(
     fun saveTask() {
         viewModelScope.launch {
             _uiState.update { state -> state.copy(currentTaskChanged = false) }
-            useCases.insertTask(_uiState.value.toTask(currentTaskId))
+            currentTaskId = useCases.insertTask(_uiState.value.toTask(currentTaskId))
         }
     }
 }
