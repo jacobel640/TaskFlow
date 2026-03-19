@@ -1,7 +1,6 @@
 package com.jel.taskflow.core.utils
 
-import com.jel.taskflow.tasks.domain.model.Task
-import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 sealed class Screen(val route: String) {
     object HomeScreen : Screen(route = "tasks_list_screen")
@@ -13,8 +12,14 @@ sealed class Screen(val route: String) {
 abstract class TaskScreen(baseRoute: String): Screen(route = baseRoute) {
     companion object {
         const val TASK_ID_ARG = "taskId"
+        const val INSTANT_MILLI_ARG = "instantMilli"
     }
-    fun withIdArg(taskId: Long? = null): String {
-        return taskId?.let { "$route?$TASK_ID_ARG=$it" } ?: "$route?$TASK_ID_ARG={$TASK_ID_ARG}"
+    fun withArgs(taskId: Long? = null, selectedDueDate: Instant? = null): String {
+        val idArg = taskId?.let { "$TASK_ID_ARG=$it" } ?: "$TASK_ID_ARG={$TASK_ID_ARG}"
+
+        val calendarArg = selectedDueDate?.let { "$INSTANT_MILLI_ARG=${it.toEpochMilliseconds()}" }
+            ?: "$INSTANT_MILLI_ARG={$INSTANT_MILLI_ARG}"
+
+        return "$route?$idArg&$calendarArg"
     }
 }

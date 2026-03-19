@@ -123,7 +123,7 @@ fun SingleTaskScreen(
                     modifier = Modifier.padding(bottom = 10.dp),
                     onClick = {
                         navController.navigate(
-                            Screen.AddEditTaskScreen.withIdArg(viewModel.taskId)
+                            Screen.AddEditTaskScreen.withArgs(viewModel.taskId)
                         )
                     },
 

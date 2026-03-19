@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                         CalendarScreen(navController = navController)
                     }
                     composable(
-                        route = Screen.SingleTaskScreen.withIdArg(),
+                        route = Screen.SingleTaskScreen.withArgs(),
                         arguments = listOf(
                             navArgument(name = TaskScreen.TASK_ID_ARG) {
                                 type = NavType.LongType
@@ -50,9 +50,13 @@ class MainActivity : ComponentActivity() {
                         SingleTaskScreen(navController = navController)
                     }
                     composable(
-                        route = Screen.AddEditTaskScreen.withIdArg(),
+                        route = Screen.AddEditTaskScreen.withArgs(),
                         arguments = listOf(
                             navArgument(name = TaskScreen.TASK_ID_ARG) {
+                                type = NavType.LongType
+                                defaultValue = -1L
+                            },
+                            navArgument(name = TaskScreen.INSTANT_MILLI_ARG) {
                                 type = NavType.LongType
                                 defaultValue = -1L
                             }

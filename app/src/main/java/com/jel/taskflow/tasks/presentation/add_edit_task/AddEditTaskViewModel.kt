@@ -1,11 +1,13 @@
 package com.jel.taskflow.tasks.presentation.add_edit_task
 
+import android.util.Log
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jel.taskflow.core.utils.TaskScreen
+import com.jel.taskflow.core.utils.toRelativeDay
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
@@ -39,6 +41,8 @@ class AddEditTaskViewModel @Inject constructor(
     private val MAX_HISTORY_SIZE = 50
 
     var currentTaskId: Long? = savedStateHandle.get<Long>(TaskScreen.TASK_ID_ARG)
+        ?.takeIf { it != -1L }
+    val calendarSelectedDueDate: Long? = savedStateHandle.get<Long>(TaskScreen.INSTANT_MILLI_ARG)
         ?.takeIf { it != -1L }
     private val _uiState = MutableStateFlow(AddEditTaskUiState())
     val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
@@ -74,7 +78,15 @@ class AddEditTaskViewModel @Inject constructor(
                 }
             }
         } ?: run {
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { state ->
+                val dueDate = calendarSelectedDueDate?.let { Instant.fromEpochMilliseconds(it) }
+                Log.d("### dueDate ###", "${dueDate?.toRelativeDay()}")
+                Log.d("### dueDateMilli ###", "$calendarSelectedDueDate")
+                state.copy(
+                    isLoading = false,
+                    dueDate = dueDate
+                )
+            }
             initTextFieldStatesHistory()
         }
     }

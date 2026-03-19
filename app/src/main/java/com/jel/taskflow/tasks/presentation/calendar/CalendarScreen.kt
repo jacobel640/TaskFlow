@@ -1,5 +1,6 @@
 package com.jel.taskflow.tasks.presentation.calendar
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,6 +57,8 @@ import com.jel.taskflow.tasks.presentation.extensions.labelRes
 import com.jel.taskflow.tasks.presentation.home.HomeUiEvent
 import com.jel.taskflow.tasks.presentation.home.TaskItem
 import kotlinx.coroutines.flow.collectLatest
+import java.time.ZoneOffset
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,6 +135,28 @@ fun CalendarScreen(
                     }
                 }
             )
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButton = {
+            AnimatedVisibility(viewMode == CalendarViewMode.DAY) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(
+                            route = Screen.AddEditTaskScreen.withArgs(
+                                selectedDueDate = Instant.fromEpochMilliseconds(
+                                    epochMilliseconds = selectedDate.atStartOfDay()
+                                        .toInstant(ZoneOffset.MIN).toEpochMilli()
+                                )
+                            )
+                        )
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = stringResource(R.string.add_task)
+                    )
+                }
+            }
         }
     ) { innerPadding ->
         Column(
@@ -251,12 +279,12 @@ fun TasksListForDate(
                     },
                     onClick = {
                         task.id?.let {
-                            navController.navigate(Screen.SingleTaskScreen.withIdArg(it))
+                            navController.navigate(Screen.SingleTaskScreen.withArgs(it))
                         }
                     },
                     onEditClick = {
                         task.id?.let {
-                            navController.navigate(Screen.AddEditTaskScreen.withIdArg(it))
+                            navController.navigate(Screen.AddEditTaskScreen.withArgs(it))
                         }
                     },
                     onComplete = {

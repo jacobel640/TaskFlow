@@ -286,14 +286,14 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     onNavigateToTaskDetails = { taskId ->
                         taskId?.let {
                             navController.navigate(
-                                route = Screen.SingleTaskScreen.withIdArg(it)
+                                route = Screen.SingleTaskScreen.withArgs(it)
                             )
                         }
                     },
                     onNavigateToTaskEdit = { taskId ->
                         taskId?.let {
                             navController.navigate(
-                                route = Screen.AddEditTaskScreen.withIdArg(it)
+                                route = Screen.AddEditTaskScreen.withArgs(it)
                             )
                         }
                     }
