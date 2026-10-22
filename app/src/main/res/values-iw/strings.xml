@@ -104,5 +104,6 @@
     <string name="auth_error_no_google_account">לא נמצא חשבון Google במכשיר</string>
     <string name="auth_error_network">אין חיבור לאינטרנט, נסה שוב</string>
     <string name="auth_error_generic">משהו השתבש, נסה שוב</string>
+    <string name="auth_error_unavailable">ההתחברות אינה זמינה בגרסה זו</string>
     <string name="privacy_policy">מדיניות פרטיות</string>
 </resources>

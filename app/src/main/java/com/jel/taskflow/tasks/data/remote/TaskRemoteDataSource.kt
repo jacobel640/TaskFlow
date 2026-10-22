@@ -11,8 +11,13 @@ import java.util.Date
 
 data class RemoteTask(val task: Task, val serverUpdatedAtMillis: Long)
 
-/** Tasks are stored per user under users/{uid}/tasks/{remoteId}. */
-class TaskRemoteDataSource(private val firestore: FirebaseFirestore) {
+/**
+ * Tasks are stored per user under users/{uid}/tasks/{remoteId}.
+ * Firestore is created on first use, so a local-only build (no Firebase) never touches it.
+ */
+class TaskRemoteDataSource(firestoreProvider: () -> FirebaseFirestore) {
+
+    private val firestore by lazy(firestoreProvider)
 
     private fun tasksCollection(uid: String): CollectionReference =
         firestore.collection(USERS_COLLECTION).document(uid).collection(TASKS_COLLECTION)

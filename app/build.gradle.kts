@@ -6,7 +6,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.services)
+}
+
+// Firebase config - downloaded from the Firebase console (not committed). Without it the app runs
+// in local-only mode (no Google sign in and no backup), which is enough for local development
+val hasFirebaseConfig = file("google-services.json").exists()
+if (hasFirebaseConfig) {
+    apply(plugin = libs.plugins.google.services.get().pluginId)
 }
 
 // release signing - read from keystore.properties (not committed) or from environment variables (CI)
@@ -73,6 +79,16 @@ android {
 
 if (releaseStoreFile == null) {
     logger.warn("TaskFlow: no release keystore configured - release builds will be unsigned (see docs/PLAY_RELEASE.md)")
+}
+
+if (!hasFirebaseConfig) {
+    logger.warn("TaskFlow: app/google-services.json is missing - debug builds run in local-only mode (see docs/PLAY_RELEASE.md)")
+    // a release without Firebase would silently ship without sign in and backup
+    tasks.named { it == "preReleaseBuild" }.configureEach {
+        doFirst {
+            throw GradleException("app/google-services.json is required for release builds (see docs/PLAY_RELEASE.md)")
+        }
+    }
 }
 
 kotlin {

@@ -125,8 +125,10 @@ To get a local copy up and running, follow these simple steps.
    git clone [https://github.com/jacobel640/taskflow.git](https://github.com/jacobel640/taskflow.git)
    ```
 2. Create a Firebase project, add an Android app with the package name `com.jel.taskflow`
-   and place its `google-services.json` in the `app/` directory (it is git-ignored and required for the build).
+   and place its `google-services.json` in the `app/` directory (it is git-ignored).
    Enable **Google** as a sign-in provider and create a **Firestore** database.
+   Without this file debug builds still run, in local-only mode (no sign-in and no backup);
+   release builds require it.
 3. Open the project in **Android Studio**.
 4. Let Gradle complete the sync and download all necessary dependencies.
 5. Build and run the app on an emulator or a physical Android device.

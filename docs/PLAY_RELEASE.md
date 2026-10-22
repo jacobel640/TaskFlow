@@ -18,7 +18,7 @@
      **Test and release → Setup → App signing** → העתק את SHA-1 ו-SHA-256.
      > ⚠️ בלי טביעת האצבע הזו ההתחברות עם Google **לא תעבוד** בגרסה שמותקנת מהחנות.
 4. הורד את `google-services.json` ושים אותו ב-`app/google-services.json`.
-   הקובץ מופיע ב-`.gitignore`, ובלעדיו הבנייה נכשלת.
+   הקובץ מופיע ב-`.gitignore`. בלעדיו גרסת debug רצה במצב מקומי בלבד (בלי התחברות וגיבוי), ובניית release נכשלת.
 5. **Authentication → Sign-in method → Google → Enable**. בחר אימייל תמיכה ושמור.
    אחרי ההפעלה, הורד שוב את `google-services.json`. הוא צריך לכלול `oauth_client` מסוג 3 (Web client).
 6. **Firestore Database → Create database** במצב **production**, ובחר אזור (למשל `eur3` / `europe-west`).

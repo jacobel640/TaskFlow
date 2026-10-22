@@ -103,6 +103,7 @@
     <string name="auth_error_no_google_account">No Google account found on this device</string>
     <string name="auth_error_network">No internet connection, please try again</string>
     <string name="auth_error_generic">Something went wrong, please try again</string>
+    <string name="auth_error_unavailable">Sign in is not available in this build</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="privacy_policy_url" translatable="false">https://github.com/jacobel640/taskflow/blob/master/PRIVACY_POLICY.md</string>
 </resources>

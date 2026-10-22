@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- overridden by the value the google-services plugin generates from google-services.json,
+         kept here so the app also compiles in local-only mode -->
+    <string name="default_web_client_id" translatable="false" />
+</resources>
