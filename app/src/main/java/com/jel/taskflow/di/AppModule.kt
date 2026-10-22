@@ -26,6 +26,7 @@ import com.jel.taskflow.tasks.domain.repository.TaskRepository
 import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
 import com.jel.taskflow.tasks.domain.use_case.DeleteTask
 import com.jel.taskflow.tasks.domain.use_case.GetFilteredTasks
+import com.jel.taskflow.tasks.domain.use_case.GetSyncState
 import com.jel.taskflow.tasks.domain.use_case.GetTask
 import com.jel.taskflow.tasks.domain.use_case.GetTasksCount
 import com.jel.taskflow.tasks.domain.use_case.InsertTask
@@ -71,14 +72,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskUseCases(repository: TaskRepository): TaskUseCases =
+    fun provideTaskUseCases(
+        app: Application,
+        repository: TaskRepository,
+        authRepository: AuthRepository
+    ): TaskUseCases =
         TaskUseCases(
             getFilteredTasks = GetFilteredTasks(repository),
             getTask = GetTask(repository),
             insertTask = InsertTask(repository),
             updateTask = UpdateTask(repository),
             deleteTask = DeleteTask(repository),
-            getTasksCount = GetTasksCount(repository)
+            getTasksCount = GetTasksCount(repository),
+            getSyncState = GetSyncState(
+                authRepository = authRepository,
+                isSyncRunning = SyncScheduler.isSyncRunning(app),
+                lastSyncFailed = SyncScheduler.lastSyncFailed(app)
+            )
         )
 
     @Provides

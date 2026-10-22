@@ -1,5 +1,6 @@
 package com.jel.taskflow.tasks.presentation.home
 
+import com.jel.taskflow.tasks.domain.model.SyncState
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.TaskSettings
 
@@ -9,7 +10,8 @@ data class HomeUiState(
     val settings: TaskSettings = TaskSettings(),
     val searchQuery: String = "",
     val isLoading: Boolean = true,
-    val tasksCount: Int = 0
+    val tasksCount: Int = 0,
+    val syncState: SyncState = SyncState()
 ) {
     val allTasks: List<Task> get() = todayTasks + otherTasks
     fun isFilterApplied(): Boolean {

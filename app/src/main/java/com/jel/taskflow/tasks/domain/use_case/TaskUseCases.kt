@@ -6,5 +6,6 @@ data class TaskUseCases(
     val insertTask: InsertTask,
     val updateTask: UpdateTask,
     val deleteTask: DeleteTask,
-    val getTasksCount: GetTasksCount
+    val getTasksCount: GetTasksCount,
+    val getSyncState: GetSyncState
 )

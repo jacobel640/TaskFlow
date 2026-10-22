@@ -8,8 +8,8 @@ import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,9 +24,10 @@ class SingleTaskViewModel @Inject constructor(
         "SingleTaskViewModel requires a non-null taskId argument" // exception log message...
     }
 
-    val uiState = useCases.getTask(taskId)
-        .filterNotNull()
-        .map { task -> SingleTaskUiState.Success(task) }
+    val uiState = combine(
+        useCases.getTask(taskId).filterNotNull(),
+        useCases.getSyncState()
+    ) { task, syncState -> SingleTaskUiState.Success(task, syncState.backupStatusOf(task)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

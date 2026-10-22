@@ -3,6 +3,7 @@ package com.jel.taskflow.tasks.presentation.calendar
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jel.taskflow.tasks.domain.model.SyncState
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.repository.UserPreferencesRepository
@@ -87,6 +88,12 @@ class CalendarViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyMap()
+    )
+
+    val syncState: StateFlow<SyncState> = taskUseCases.getSyncState().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = SyncState()
     )
 
     fun onDateSelected(date: LocalDate) {
