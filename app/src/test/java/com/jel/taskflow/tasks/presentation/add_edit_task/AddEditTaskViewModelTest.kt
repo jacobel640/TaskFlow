@@ -3,12 +3,14 @@ package com.jel.taskflow.tasks.presentation.add_edit_task
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
+import com.jel.taskflow.auth.data.repository.LocalOnlyAuthRepository
 import com.jel.taskflow.core.utils.TaskScreen
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.domain.model.TaskSettings
 import com.jel.taskflow.tasks.domain.repository.TaskRepository
 import com.jel.taskflow.tasks.domain.use_case.DeleteTask
 import com.jel.taskflow.tasks.domain.use_case.GetFilteredTasks
+import com.jel.taskflow.tasks.domain.use_case.GetSyncState
 import com.jel.taskflow.tasks.domain.use_case.GetTask
 import com.jel.taskflow.tasks.domain.use_case.GetTasksCount
 import com.jel.taskflow.tasks.domain.use_case.InsertTask
@@ -51,7 +53,12 @@ class AddEditTaskViewModelTest {
             insertTask = InsertTask(repository),
             updateTask = UpdateTask(repository),
             deleteTask = DeleteTask(repository),
-            getTasksCount = GetTasksCount(repository)
+            getTasksCount = GetTasksCount(repository),
+            getSyncState = GetSyncState(
+                authRepository = LocalOnlyAuthRepository(),
+                isSyncRunning = flowOf(false),
+                lastSyncFailed = flowOf(false)
+            )
         ),
         savedStateHandle = SavedStateHandle(mapOf(TaskScreen.TASK_ID_ARG to 1L))
     )
