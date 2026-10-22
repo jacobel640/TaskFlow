@@ -2,6 +2,7 @@ package com.jel.taskflow.tasks.domain.model
 
 import com.jel.taskflow.tasks.domain.model.enums.BackupStatus
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SyncStateTest {
@@ -10,11 +11,11 @@ class SyncStateTest {
     private val dirtyTask = syncedTask.copy(isDirty = true)
 
     @Test
-    fun `guest tasks are local only`() {
+    fun `guest tasks have no backup status`() {
         val state = SyncState(isSignedIn = false)
 
-        assertEquals(BackupStatus.LOCAL_ONLY, state.backupStatusOf(syncedTask))
-        assertEquals(BackupStatus.LOCAL_ONLY, state.backupStatusOf(dirtyTask))
+        assertNull(state.backupStatusOf(syncedTask))
+        assertNull(state.backupStatusOf(dirtyTask))
     }
 
     @Test
