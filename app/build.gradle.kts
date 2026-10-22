@@ -131,6 +131,11 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.kotlinx.coroutines.play.services)
+    constraints {
+        // room-testing (room-migration) is built against 1.8.1, but the test APK is aligned with the
+        // app's versions, where navigation would otherwise resolve 1.7.3 (AbstractMethodError at runtime)
+        implementation(libs.kotlinx.serialization.json)
+    }
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
