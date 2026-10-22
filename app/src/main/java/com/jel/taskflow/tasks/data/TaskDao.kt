@@ -14,14 +14,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDao {
 
-    @Query("SELECT * from tasks")
+    @Query("SELECT * from tasks WHERE isDeleted = 0")
     fun getTasks(): Flow<List<Task>>
 
     @Query("""
-        SELECT * FROM tasks 
-        WHERE (status != 'COMPLETED' OR :showCompleted = 1)
+        SELECT * FROM tasks
+        WHERE isDeleted = 0
+        AND (status != 'COMPLETED' OR :showCompleted = 1)
         AND (title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%')
-        ORDER BY 
+        ORDER BY
             CASE WHEN :sortType = 'TITLE' AND :sortDir = 'ASC' THEN title END ASC,
             CASE WHEN :sortType = 'TITLE' AND :sortDir = 'DES' THEN title END DESC,
             CASE WHEN :sortType = 'PRIORITY' AND :sortDir = 'ASC' THEN priority END ASC,
@@ -43,7 +44,7 @@ interface TaskDao {
     @RawQuery(observedEntities = [Task::class])
     fun getTasksFiltered(rawQuery: SimpleSQLiteQuery): Flow<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE id = :taskId")
+    @Query("SELECT * FROM tasks WHERE id = :taskId AND isDeleted = 0")
     fun getTaskById(taskId: Long): Flow<Task?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -55,6 +56,30 @@ interface TaskDao {
     @Delete
     suspend fun deleteTask(task: Task)
 
-    @Query("SELECT COUNT(*) FROM tasks")
+    @Query("SELECT COUNT(*) FROM tasks WHERE isDeleted = 0")
     fun getTasksCount(): Flow<Int>
+
+    // sync queries
+
+    @Query("SELECT * FROM tasks WHERE id = :taskId")
+    suspend fun findTaskById(taskId: Long): Task?
+
+    @Query("SELECT * FROM tasks WHERE remoteId = :remoteId")
+    suspend fun findTaskByRemoteId(remoteId: String): Task?
+
+    @Query("SELECT * FROM tasks WHERE isDirty = 1")
+    suspend fun getDirtyTasks(): List<Task>
+
+    // only clears the flag if the task was not changed again while it was uploading
+    @Query("UPDATE tasks SET isDirty = 0 WHERE remoteId = :remoteId AND lastModified = :lastModified")
+    suspend fun markSynced(remoteId: String, lastModified: Long)
+
+    @Query("UPDATE tasks SET isDirty = 1")
+    suspend fun markAllDirty()
+
+    @Query("DELETE FROM tasks WHERE isDeleted = 1 AND isDirty = 0")
+    suspend fun purgeSyncedDeletedTasks()
+
+    @Query("DELETE FROM tasks WHERE isDeleted = 1")
+    suspend fun purgeDeletedTasks()
 }

@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Each signed in user can only read and write their own tasks: users/{uid}/tasks/{taskId}
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid}/tasks/{taskId} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isValidTask(request.resource.data);
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isValidTask(task) {
+      return task.keys().hasAll(['title', 'content', 'status', 'createdDate', 'changedDate',
+                                 'lastModified', 'isDeleted', 'serverUpdatedAt'])
+        && task.title is string && task.title.size() <= 10000
+        && task.content is string && task.content.size() <= 100000
+        && task.status in ['TODO', 'IN_PROGRESS', 'COMPLETED']
+        && (task.priority == null || task.priority in ['LOW', 'MEDIUM', 'HIGH'])
+        && (task.dueDate == null || task.dueDate is int)
+        && task.createdDate is int
+        && task.changedDate is int
+        && task.lastModified is int
+        && task.isDeleted is bool
+        && task.serverUpdatedAt == request.time;
+    }
+
+    // everything else is denied
+  }
+}

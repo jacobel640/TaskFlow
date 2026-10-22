@@ -3,6 +3,8 @@ package com.jel.taskflow.core.utils
 import kotlin.time.Instant
 
 sealed class Screen(val route: String) {
+    object WelcomeScreen : Screen(route = "welcome_screen")
+    object AccountScreen : Screen(route = "account_screen")
     object HomeScreen : Screen(route = "tasks_list_screen")
     object CalendarScreen : Screen(route = "calendar_screen")
     object SingleTaskScreen : TaskScreen(baseRoute = "single_task_screen")
