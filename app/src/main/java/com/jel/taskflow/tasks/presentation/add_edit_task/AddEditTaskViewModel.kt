@@ -143,8 +143,10 @@ class AddEditTaskViewModel @Inject constructor(
                 priority = priority,
                 dueDate = dueDate,
                 changedDate = Clock.System.now(),
+                // compare the text right away: the undo history is only updated after the
+                // typing debounce, so it can't tell yet whether a quick edit happened
                 currentTaskChanged = currentTaskChanged ||
-                        (titleHistoryPosition > 0 || contentHistoryPosition > 0)
+                        title.text != state.title.text || content.text != state.content.text
             )
         }
     }
