@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.jel.taskflow.R
 import com.jel.taskflow.core.utils.Screen
+import com.jel.taskflow.tasks.domain.model.SyncState
 import com.jel.taskflow.tasks.domain.model.Task
 import com.jel.taskflow.tasks.presentation.calendar.components.DayHeaderView
 import com.jel.taskflow.tasks.presentation.calendar.components.MonthView
@@ -69,6 +70,7 @@ fun CalendarScreen(
     val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
     val viewMode by viewModel.viewMode.collectAsStateWithLifecycle()
     val tasksByDate by viewModel.tasksByDate.collectAsStateWithLifecycle()
+    val syncState by viewModel.syncState.collectAsStateWithLifecycle()
     val allTasks = remember(tasksByDate) {
         tasksByDate.values.flatten()
     }
@@ -208,6 +210,7 @@ fun CalendarScreen(
 
             TasksListForDate(
                 tasks = allTasks,
+                syncState = syncState,
                 onToggleCompletedTask = viewModel::toggleCompleteTask,
                 onDeleteTask = viewModel::deleteTask,
                 navController = navController
@@ -247,6 +250,7 @@ fun ViewModeSelector(currentMode: CalendarViewMode, onModeSelected: (CalendarVie
 @Composable
 fun TasksListForDate(
     tasks: List<Task>,
+    syncState: SyncState,
     onToggleCompletedTask: (Task) -> Unit,
     onDeleteTask: (Long) -> Unit,
     navController: NavController) {
@@ -273,6 +277,7 @@ fun TasksListForDate(
             items(tasks, key = { it.id ?: it.hashCode() }) { task ->
                 TaskItem(
                     task = task,
+                    backupStatus = syncState.backupStatusOf(task),
                     expanded = (task == expandedItem),
                     onExpandedClicked = {
                         expandedItem = if (expandedItem == task) null else task

@@ -97,6 +97,11 @@
     <string name="sync_failed">Backup failed, will retry automatically</string>
     <string name="sync_pending">Waiting for the first backup</string>
     <string name="last_backup">Last backup: %1$s</string>
+    <string name="backup_status_local_only">On this device only</string>
+    <string name="backup_status_pending">Waiting to back up</string>
+    <string name="backup_status_backing_up">Backing up…</string>
+    <string name="backup_status_backed_up">Backed up</string>
+    <string name="backup_status_failed">Backup failed</string>
     <string name="signed_in_message">Signed in - your tasks are being backed up</string>
     <string name="signed_out_message">Signed out - your tasks stay on this device</string>
     <string name="account_deleted_message">Your account was deleted</string>

@@ -60,8 +60,9 @@ class HomeViewModel @Inject constructor(
         filteredTasksFlow,
         userPreferencesRepository.taskSettingsFlow,
         _searchQuery,
-        totalCountFlow
-    ) { (filteredTasks, isLoading), settings, searchQuery, tasksCount ->
+        totalCountFlow,
+        taskUseCases.getSyncState()
+    ) { (filteredTasks, isLoading), settings, searchQuery, tasksCount, syncState ->
 
         val today = LocalDate.now()
         val todayTasks = mutableListOf<Task>()
@@ -86,7 +87,8 @@ class HomeViewModel @Inject constructor(
             settings = settings,
             searchQuery = searchQuery,
             isLoading = isLoading,
-            tasksCount = tasksCount
+            tasksCount = tasksCount,
+            syncState = syncState
         )
     }.stateIn(
         scope = viewModelScope,

@@ -98,6 +98,11 @@
     <string name="sync_failed">הגיבוי נכשל, ננסה שוב אוטומטית</string>
     <string name="sync_pending">ממתין לגיבוי הראשון</string>
     <string name="last_backup">גיבוי אחרון: %1$s</string>
+    <string name="backup_status_local_only">במכשיר בלבד</string>
+    <string name="backup_status_pending">ממתין לגיבוי</string>
+    <string name="backup_status_backing_up">מגבה…</string>
+    <string name="backup_status_backed_up">מגובה</string>
+    <string name="backup_status_failed">הגיבוי נכשל</string>
     <string name="signed_in_message">התחברת - המשימות שלך מגובות</string>
     <string name="signed_out_message">התנתקת - המשימות נשארות במכשיר</string>
     <string name="account_deleted_message">החשבון נמחק</string>

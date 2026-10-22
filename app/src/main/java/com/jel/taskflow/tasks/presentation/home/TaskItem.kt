@@ -66,6 +66,7 @@ import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.core.theme.TaskFlowTheme
 import com.jel.taskflow.core.utils.toRelativeDay
 import com.jel.taskflow.tasks.domain.model.Task
+import com.jel.taskflow.tasks.domain.model.enums.BackupStatus
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
@@ -86,6 +87,7 @@ val ColorScheme.collapsedColor: Color
 fun TaskItem(
     modifier: Modifier = Modifier,
     task: Task,
+    backupStatus: BackupStatus? = null,
     expanded: Boolean = false,
     onExpandedClicked: () -> Unit,
     onClick: () -> Unit,
@@ -157,7 +159,8 @@ fun TaskItem(
                         TopIndicationChips(
                             status = task.status,
                             priority = task.priority,
-                            dueDate = task.dueDate
+                            dueDate = task.dueDate,
+                            backupStatus = backupStatus
                         )
                         Spacer(Modifier.padding(vertical = 5.dp))
                         Text(
@@ -218,7 +221,8 @@ fun TaskItem(
 fun TopIndicationChips(
     status: Status,
     priority: Priority?,
-    dueDate: Instant?
+    dueDate: Instant?,
+    backupStatus: BackupStatus? = null
     ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -243,6 +247,15 @@ fun TopIndicationChips(
                 imageVector = Icons.Rounded.Event,
                 color = MaterialTheme.colorScheme.primary,
                 containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        }
+        // icon only to keep the list compact, the label is read by TalkBack
+        backupStatus?.let {
+            IndicatorChip(
+                imageVector = backupStatus.imageVector,
+                color = backupStatus.color,
+                containerColor = backupStatus.containerColor,
+                contentDescription = stringResource(backupStatus.labelRes)
             )
         }
     }
@@ -434,6 +447,7 @@ fun TaskItemPreview() {
     TaskFlowTheme {
         TaskItem(
             task = Task(title = "title", content = "content", priority = Priority.HIGH, dueDate = Clock.System.now()),
+            backupStatus = BackupStatus.BACKED_UP,
             expanded = true,
             onExpandedClicked = {},
             onClick = {},

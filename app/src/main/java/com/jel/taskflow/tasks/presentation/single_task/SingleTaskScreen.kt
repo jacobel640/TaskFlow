@@ -42,6 +42,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.jel.taskflow.R
+import com.jel.taskflow.core.components.IndicatorChip
 import com.jel.taskflow.core.utils.Screen
 import com.jel.taskflow.core.utils.toRelativeDay
 import com.jel.taskflow.core.utils.toRelativeTime
@@ -49,6 +50,7 @@ import com.jel.taskflow.tasks.presentation.add_edit_task.components.StatusGroupB
 import com.jel.taskflow.tasks.presentation.components.DeleteConfirmDialog
 import com.jel.taskflow.tasks.presentation.extensions.color
 import com.jel.taskflow.tasks.presentation.extensions.containerColor
+import com.jel.taskflow.tasks.presentation.extensions.imageVector
 import com.jel.taskflow.tasks.presentation.extensions.labelRes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +62,7 @@ fun SingleTaskScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     if (uiState is SingleTaskUiState.Success) {
         val currentTask = (uiState as SingleTaskUiState.Success).task
+        val backupStatus = (uiState as SingleTaskUiState.Success).backupStatus
         var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
 
         if (showDeleteConfirmDialog) {
@@ -145,6 +148,13 @@ fun SingleTaskScreen(
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 5.dp)
+                )
+                IndicatorChip(
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    label = stringResource(backupStatus.labelRes),
+                    imageVector = backupStatus.imageVector,
+                    color = backupStatus.color,
+                    containerColor = backupStatus.containerColor
                 )
                 currentTask.dueDate?.let { dueDate ->
                     Text(

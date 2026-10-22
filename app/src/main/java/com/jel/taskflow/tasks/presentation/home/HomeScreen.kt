@@ -399,6 +399,7 @@ fun TasksList(
                     TaskItem(
                         modifier = Modifier.animateItem(),
                         task = task,
+                        backupStatus = uiState.syncState.backupStatusOf(task),
                         expanded = (task == expandedItem),
                         onExpandedClicked = {
                             expandedItem = if (expandedItem == task) null else task
@@ -435,6 +436,7 @@ fun TasksList(
                     TaskItem(
                         modifier = Modifier.animateItem(),
                         task = task,
+                        backupStatus = uiState.syncState.backupStatusOf(task),
                         expanded = (task == expandedItem),
                         onExpandedClicked = {
                             expandedItem = if (expandedItem == task) null else task
