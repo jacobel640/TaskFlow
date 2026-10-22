@@ -149,13 +149,15 @@ fun SingleTaskScreen(
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 5.dp)
                 )
-                IndicatorChip(
-                    modifier = Modifier.padding(horizontal = 5.dp),
-                    label = stringResource(backupStatus.labelRes),
-                    imageVector = backupStatus.imageVector,
-                    color = backupStatus.color,
-                    containerColor = backupStatus.containerColor
-                )
+                backupStatus?.let {
+                    IndicatorChip(
+                        modifier = Modifier.padding(horizontal = 5.dp),
+                        label = stringResource(backupStatus.labelRes),
+                        imageVector = backupStatus.imageVector,
+                        color = backupStatus.color,
+                        containerColor = backupStatus.containerColor
+                    )
+                }
                 currentTask.dueDate?.let { dueDate ->
                     Text(
                         text = stringResource(R.string.due_date),
