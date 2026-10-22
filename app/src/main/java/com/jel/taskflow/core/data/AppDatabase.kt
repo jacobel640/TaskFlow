@@ -11,7 +11,7 @@ import com.jel.taskflow.tasks.domain.model.Task
 
 @Database(
     entities = [Task::class],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4)
@@ -41,6 +41,19 @@ abstract class AppDatabase: RoomDatabase() {
                 if (!columnExists) {
                     db.execSQL("ALTER TABLE tasks ADD COLUMN priority TEXT NOT NULL DEFAULT 'MEDIUM'")
                 }
+            }
+        }
+
+        // adds the sync metadata columns - every existing task gets a unique remoteId
+        // and is marked dirty so it will be backed up on the first sign in
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE tasks ADD COLUMN remoteId TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE tasks ADD COLUMN isDeleted INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE tasks ADD COLUMN isDirty INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE tasks ADD COLUMN lastModified INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("UPDATE tasks SET remoteId = lower(hex(randomblob(16))), lastModified = changedDate")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_tasks_remoteId ON tasks (remoteId)")
             }
         }
     }

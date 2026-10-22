@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -19,6 +20,7 @@ import com.jel.taskflow.tasks.presentation.calendar.components.daysStartingSunda
 import com.jel.taskflow.tasks.presentation.extensions.nullName
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import javax.inject.Inject
@@ -38,6 +40,9 @@ class UserPreferencesRepository @Inject constructor(@ApplicationContext private 
         val FILTER_BY_PRIORITY = stringSetPreferencesKey("filter_by_priority")
         val FILTER_BY_STATUS = stringSetPreferencesKey("filter_by_status")
         val SHOW_COMPLETED_TASKS = booleanPreferencesKey("show_completed_tasks")
+        val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
+        val LAST_SYNC_TIME = longPreferencesKey("last_sync_time")
+        fun lastPulledAt(uid: String) = longPreferencesKey("last_pulled_at_$uid")
     }
 
     val notificationSettingsFlow: Flow<NotificationSettings> = context.dataStore.data
@@ -142,6 +147,45 @@ class UserPreferencesRepository @Inject constructor(@ApplicationContext private 
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.FILTER_BY_STATUS] = emptySet()
             preferences[PreferencesKeys.FILTER_BY_PRIORITY] = emptySet()
+        }
+    }
+
+    val onboardingDoneFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.ONBOARDING_DONE] ?: false }
+
+    suspend fun setOnboardingDone() {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.ONBOARDING_DONE] = true
+        }
+    }
+
+    val lastSyncTimeFlow: Flow<Long?> = context.dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.LAST_SYNC_TIME] }
+
+    suspend fun updateLastSyncTime(timeMillis: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_SYNC_TIME] = timeMillis
+        }
+    }
+
+    suspend fun clearLastSyncTime() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(PreferencesKeys.LAST_SYNC_TIME)
+        }
+    }
+
+    suspend fun getLastPulledAt(uid: String): Long =
+        context.dataStore.data.first()[PreferencesKeys.lastPulledAt(uid)] ?: 0L
+
+    suspend fun updateLastPulledAt(uid: String, timeMillis: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.lastPulledAt(uid)] = timeMillis
+        }
+    }
+
+    suspend fun clearLastPulledAt(uid: String) {
+        context.dataStore.edit { preferences ->
+            preferences.remove(PreferencesKeys.lastPulledAt(uid))
         }
     }
 }

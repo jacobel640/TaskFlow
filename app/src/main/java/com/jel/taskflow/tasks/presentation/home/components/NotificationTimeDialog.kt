@@ -1,11 +1,7 @@
 package com.jel.taskflow.tasks.presentation.home.components
 
 import android.Manifest
-import android.app.AlarmManager
-import android.content.Context
-import android.content.Intent
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -43,7 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jel.taskflow.R
 import com.jel.taskflow.tasks.framework.workers.NotificationScheduler
@@ -69,34 +64,6 @@ fun NotificationTimeDialog(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
-    }
-
-    var showExactAlarmSettingsDialog by remember { mutableStateOf(false) }
-
-    if (showExactAlarmSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = { showExactAlarmSettingsDialog = false },
-            title = { Text(stringResource(R.string.exact_alarm_permission_title)) },
-            text = { Text(stringResource(R.string.exact_alarm_permission_desc)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showExactAlarmSettingsDialog = false
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                            data = "package:${context.packageName}".toUri()
-                        }
-                        context.startActivity(intent)
-                    }
-                }) {
-                    Text(stringResource(R.string.go_to_settings))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showExactAlarmSettingsDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
     }
 
     val savedNotificationSettings by homeViewModel.notificationSettings.collectAsStateWithLifecycle()
@@ -161,25 +128,19 @@ fun NotificationTimeDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val hour = timePickerState.hour
+                val minute = timePickerState.minute
+                coroutineScope.launch {
+                    homeViewModel.updateNotificationSettings(hour, minute, selectedDays)
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                    showExactAlarmSettingsDialog = true
-                } else {
-                    val hour = timePickerState.hour
-                    val minute = timePickerState.minute
-                    coroutineScope.launch {
-                        homeViewModel.updateNotificationSettings(hour, minute, selectedDays)
+                    NotificationScheduler.scheduleNextAlarm(context, hour, minute, selectedDays)
 
-                        NotificationScheduler.scheduleNextAlarm(context, hour, minute, selectedDays)
+                    onConfirm(
+                        if (hour < 10) "0$hour" else "$hour",
+                        if (minute < 10) "0$minute" else "$minute"
+                    )
 
-                        onConfirm(
-                            if (hour < 10) "0$hour" else "$hour",
-                            if (minute < 10) "0$minute" else "$minute"
-                        )
-
-                        onDismiss()
-                    }
+                    onDismiss()
                 }
             }) {
                 Text(stringResource(R.string.save))

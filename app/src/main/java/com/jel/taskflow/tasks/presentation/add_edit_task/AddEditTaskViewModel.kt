@@ -1,13 +1,11 @@
 package com.jel.taskflow.tasks.presentation.add_edit_task
 
-import android.util.Log
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jel.taskflow.core.utils.TaskScreen
-import com.jel.taskflow.core.utils.toRelativeDay
 import com.jel.taskflow.tasks.domain.model.enums.Priority
 import com.jel.taskflow.tasks.domain.model.enums.Status
 import com.jel.taskflow.tasks.domain.use_case.TaskUseCases
@@ -80,8 +78,6 @@ class AddEditTaskViewModel @Inject constructor(
         } ?: run {
             _uiState.update { state ->
                 val dueDate = calendarSelectedDueDate?.let { Instant.fromEpochMilliseconds(it) }
-                Log.d("### dueDate ###", "${dueDate?.toRelativeDay()}")
-                Log.d("### dueDateMilli ###", "$calendarSelectedDueDate")
                 state.copy(
                     isLoading = false,
                     dueDate = dueDate

@@ -75,13 +75,34 @@
     <string name="good_afternoon_title">Good Afternoon ☀️</string>
     <string name="good_evening_title">Good Evening 🌆</string>
     <string name="good_night_title">Good Night 🌙</string>
-    <string name="exact_alarm_permission_title">Exact Alarm Permission Required</string>
-    <string name="exact_alarm_permission_desc">To ensure notifications arrive exactly at the time
-        you chose (and are not delayed by battery optimization), please enable this permission in
-        the settings screen that will open now.
-    </string>
-    <string name="go_to_settings">Go to settings</string>
     <string name="delete_task_failed_message">cannot find task with id: %1$d</string>
     <string name="toggle_completed_snackbar_message">Marked as %1$s</string>
     <string name="priority_none">None</string>
+    <string name="account">Account</string>
+    <string name="welcome_subtitle">Organize your tasks, plan your days and never miss what matters.</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="continue_with_google_desc">Your tasks are saved on this device and automatically backed up to your account.</string>
+    <string name="continue_without_account">Continue without an account</string>
+    <string name="continue_without_account_desc">Your tasks are saved on this device only. You can sign in later from the account screen.</string>
+    <string name="guest_mode_title">Using TaskFlow without an account</string>
+    <string name="guest_mode_desc">Your tasks are saved on this device only. Sign in with Google to back them up automatically and keep them across devices.</string>
+    <string name="sign_in_for_backup">Sign in with Google for backup</string>
+    <string name="backup_now">Back up now</string>
+    <string name="sign_out">Sign out</string>
+    <string name="sign_out_desc">After signing out your tasks stay on this device, but are no longer backed up.</string>
+    <string name="delete_account">Delete account</string>
+    <string name="delete_account_dialog_title">Delete your account?</string>
+    <string name="delete_account_dialog_message">Your account and all the tasks backed up in the cloud will be permanently deleted. Tasks on this device will stay here. This cannot be undone.</string>
+    <string name="sync_in_progress">Backing up…</string>
+    <string name="sync_failed">Backup failed, will retry automatically</string>
+    <string name="sync_pending">Waiting for the first backup</string>
+    <string name="last_backup">Last backup: %1$s</string>
+    <string name="signed_in_message">Signed in - your tasks are being backed up</string>
+    <string name="signed_out_message">Signed out - your tasks stay on this device</string>
+    <string name="account_deleted_message">Your account was deleted</string>
+    <string name="auth_error_no_google_account">No Google account found on this device</string>
+    <string name="auth_error_network">No internet connection, please try again</string>
+    <string name="auth_error_generic">Something went wrong, please try again</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="privacy_policy_url" translatable="false">https://github.com/jacobel640/taskflow/blob/master/PRIVACY_POLICY.md</string>
 </resources>

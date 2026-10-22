@@ -4,12 +4,13 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 object NotificationScheduler {
+
+    private const val ALARM_WINDOW_MILLIS = 10 * 60 * 1000L // 10 minutes window
 
     fun scheduleNextAlarm(
         context: Context,
@@ -39,19 +40,12 @@ object NotificationScheduler {
 
         val targetMillis = targetTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetMillis, pendingIntent)
-            } else {
-                alarmManager.setWindow(
-                    AlarmManager.RTC_WAKEUP,
-                    targetMillis,
-                    10 * 60 * 1000L, // 10 minutes window
-                    pendingIntent
-                )
-            }
-        } else {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetMillis, pendingIntent)
-        }
+        // inexact alarm - a daily summary doesn't need the restricted SCHEDULE_EXACT_ALARM permission
+        alarmManager.setWindow(
+            AlarmManager.RTC_WAKEUP,
+            targetMillis,
+            ALARM_WINDOW_MILLIS,
+            pendingIntent
+        )
     }
 }

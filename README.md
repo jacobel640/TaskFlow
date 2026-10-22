@@ -38,6 +38,12 @@ TaskFlow is built to demonstrate modern Android development best practices, feat
 * **Boot Receiver:** Automatically reschedules notifications when the device reboots.
 * **User Preferences:** Saves user settings (like notification times and sorting preferences) safely using `DataStore Preferences`.
 
+### ☁️ Offline-First with Cloud Backup
+* **Works without an account:** Continue as a guest and your tasks are stored on the device only.
+* **Sign in with Google:** Tasks are automatically backed up to **Cloud Firestore** and synced across devices.
+* **Offline-first:** Room stays the source of truth - every change is saved locally first and uploaded in the background by `WorkManager`.
+* **Your data, your control:** Sign out at any time (tasks stay on the device) or permanently delete your account and cloud backup from the Account screen.
+
 ### 🎨 Modern UI/UX
 * **Material Design 3:** Beautiful, responsive, and intuitive interface.
 * **Dark/Light Theme:** Full support for system-wide dark and light modes.
@@ -93,6 +99,8 @@ This project strictly follows **Clean Architecture** principles (Data, Domain, a
 
 ### Data & Local Storage
 * **Room Database:** Local SQLite database mapping for offline task storage.
+* **Firebase Authentication + Credential Manager:** Sign in with Google.
+* **Cloud Firestore:** Per-user cloud backup (`users/{uid}/tasks`), with last-write-wins sync and security rules in `firestore.rules`.
 * **DataStore Preferences:** Asynchronous preference saving (replacing SharedPreferences).
 * **Dagger Hilt:** Dependency Injection to ensure components are decoupled and testable.
 
@@ -116,9 +124,19 @@ To get a local copy up and running, follow these simple steps.
    ```bash
    git clone [https://github.com/jacobel640/taskflow.git](https://github.com/jacobel640/taskflow.git)
    ```
-2. Open the project in **Android Studio**.
-3. Let Gradle complete the sync and download all necessary dependencies.
-4. Build and run the app on an emulator or a physical Android device.
+2. Create a Firebase project, add an Android app with the package name `com.jel.taskflow`
+   and place its `google-services.json` in the `app/` directory (it is git-ignored and required for the build).
+   Enable **Google** as a sign-in provider and create a **Firestore** database.
+3. Open the project in **Android Studio**.
+4. Let Gradle complete the sync and download all necessary dependencies.
+5. Build and run the app on an emulator or a physical Android device.
+
+### Release build
+Release signing is read from a git-ignored `keystore.properties` file (or `TASKFLOW_KEYSTORE_*` environment variables), then:
+```bash
+./gradlew bundleRelease
+```
+The full Google Play publishing guide (Firebase setup, signing, Data safety answers) is in [`docs/PLAY_RELEASE.md`](docs/PLAY_RELEASE.md).
 
 ---
 
